@@ -1,0 +1,850 @@
+---
+import Layout from '../layouts/Layout.astro';
+import rawIssues from '../data/issues.json';
+
+interface CommentItem {
+  author: string;
+  text: string;
+  createdAt: string;
+}
+
+interface LabelItem {
+  name: string;
+  color: string;
+}
+
+interface IssueItem {
+  id: number;
+  title: string;
+  state: string;
+  url: string;
+  createdAt: string;
+  updatedAt: string;
+  riskLevel: 'high' | 'warning' | 'resolved' | 'archive';
+  labels: LabelItem[];
+  summary: string;
+  body?: string;
+  commentCount: number;
+  reactionCount: number;
+  latestComments: CommentItem[];
+}
+
+const issues = (rawIssues as IssueItem[]).sort(
+  (a, b) => new Date(b.updatedAt).getTime() - new Date(a.updatedAt).getTime()
+);
+
+// KPI 统计计算（构建期静态生成）
+const now = Date.now();
+const DAY_MS = 86400000;
+
+const recent7dCount = issues.filter(
+  (i) => i.state === 'OPEN' && now - new Date(i.updatedAt).getTime() <= 7 * DAY_MS
+).length;
+
+const counts = {
+  all: issues.length,
+  high: issues.filter((i) => i.riskLevel === 'high').length,
+  warning: issues.filter((i) => i.riskLevel === 'warning').length,
+  resolved: issues.filter((i) => i.riskLevel === 'resolved').length,
+  archive: issues.filter((i) => i.riskLevel === 'archive').length,
+};
+
+const lastSyncedAt = new Intl.DateTimeFormat('zh-CN', {
+  timeZone: 'Asia/Shanghai',
+  month: '2-digit',
+  day: '2-digit',
+  hour: '2-digit',
+  minute: '2-digit',
+  hour12: false,
+}).format(new Date());
+
+const riskMeta = {
+  high: { label: '预警 / 疑似跑路', className: 'badge-high' },
+  warning: { label: '异常观察中', className: 'badge-warning' },
+  resolved: { label: '已恢复 / 误报', className: 'badge-resolved' },
+  archive: { label: '归档', className: 'badge-archive' },
+};
+
+function formatDate(iso: string) {
+  return new Intl.DateTimeFormat('zh-CN', {
+    timeZone: 'Asia/Shanghai',
+    year: 'numeric',
+    month: '2-digit',
+    day: '2-digit',
+  }).format(new Date(iso));
+}
+---
+
+<Layout title="你的机场，跑路了吗？ | 机场跑路预警与状态追踪看板">
+  <div data-pagefind-ignore>
+    <!-- 1. KPI 态势栏：恢复原本颜色与发光特效，保留无边框设计 -->
+    <section class="kpi-grid" aria-label="预警概览">
+      <div class="kpi-card kpi-danger">
+        <span class="kpi-label">当前预警</span>
+        <strong class="kpi-value">{counts.high}</strong>
+        <span class="kpi-sub">近期高频讨论 / 标记预警</span>
+      </div>
+      <div class="kpi-card kpi-warn">
+        <span class="kpi-label">近 7 天活跃反馈</span>
+        <strong class="kpi-value">{recent7dCount}</strong>
+        <span class="kpi-sub">开启状态且 7 日内有动态</span>
+      </div>
+      <div class="kpi-card kpi-total">
+        <span class="kpi-label">累计收录线索</span>
+        <strong class="kpi-value">{counts.all}</strong>
+        <span class="kpi-sub">含观察中 {counts.warning} 条</span>
+      </div>
+      <div class="kpi-card kpi-sync">
+        <span class="kpi-label">最后同步 (UTC+8)</span>
+        <strong class="kpi-value kpi-time">{lastSyncedAt}</strong>
+        <span class="kpi-sub">GitHub Actions 自动更新</span>
+      </div>
+    </section>
+
+    <!-- 2. Pagefind 全文搜索区 -->
+    <section class="search-section" aria-label="全文检索">
+      <div class="search-bar-row">
+        <div class="search-title-stack" aria-label="买前搜一下">
+          <div class="title-top"><span>买</span><span>前</span></div>
+          <div class="title-bottom"><span>搜</span><span>一</span><span>下</span></div>
+        </div>
+        <div id="pagefind-search" class="search-input-wrap">
+          <div class="search-placeholder-bar" aria-hidden="true">
+            <svg class="search-placeholder-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="11" cy="11" r="8"></circle>
+              <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+            </svg>
+            <span class="search-placeholder-text">输入机场名称、官网域名或关键词（如：失联、删库、退款）...</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- 3. 风险等级筛选与排序控制条 -->
+    <section class="toolbar" aria-label="筛选与排序">
+      <div class="filter-pills" role="tablist">
+        <button class="pill active" data-risk="all">
+          全部 <span class="pill-count">{counts.all}</span>
+        </button>
+        <button class="pill" data-risk="high">
+          🔴 预警 <span class="pill-count">{counts.high}</span>
+        </button>
+        <button class="pill" data-risk="warning">
+          🟡 观察中 <span class="pill-count">{counts.warning}</span>
+        </button>
+        <button class="pill" data-risk="resolved">
+          🟢 已恢复 <span class="pill-count">{counts.resolved}</span>
+        </button>
+        <button class="pill" data-risk="archive">
+          ⚪ 归档 <span class="pill-count">{counts.archive}</span>
+        </button>
+      </div>
+
+      <div class="toolbar-selects">
+        <select id="time-filter" aria-label="时间范围">
+          <option value="all">全部时间</option>
+          <option value="7">近 7 天活跃</option>
+          <option value="30">近 30 天活跃</option>
+        </select>
+
+        <select id="sort-select" aria-label="排序方式">
+          <option value="updated">最新动态优先</option>
+          <option value="hot">讨论热度优先</option>
+          <option value="created">最新发布优先</option>
+        </select>
+      </div>
+    </section>
+
+    <!-- 4. 预警卡片流 -->
+    <section id="cards-grid" class="cards-grid">
+      {
+        issues.map((item) => {
+          const meta = riskMeta[item.riskLevel] || riskMeta.archive;
+          const updatedTs = new Date(item.updatedAt).getTime();
+          const createdTs = new Date(item.createdAt).getTime();
+          const hotScore = item.commentCount * 2 + item.reactionCount;
+          const latestComment = item.latestComments && item.latestComments[0];
+
+          return (
+            <article
+              class="issue-card"
+              data-risk={item.riskLevel}
+              data-updated={updatedTs}
+              data-created={createdTs}
+              data-hot={hotScore}
+            >
+              <div class="card-top">
+                <span class={`risk-badge ${meta.className}`}>{meta.label}</span>
+                <span class="issue-meta">
+                  #{item.id} · 更新于 {formatDate(item.updatedAt)}
+                </span>
+              </div>
+
+              <h2 class="card-title">
+                <a href={`/issue/${item.id}/`}>{item.title}</a>
+              </h2>
+
+              {item.labels && item.labels.length > 0 && (
+                <div class="label-row">
+                  {item.labels.map((label) => (
+                    <span class="gh-label">{label.name}</span>
+                  ))}
+                </div>
+              )}
+
+              <p class="card-summary">
+                {item.summary || '暂无正文描述，点击查看原贴详情。'}
+              </p>
+
+              {latestComment && (
+                <div class="latest-comment">
+                  <span class="comment-icon">💬</span>
+                  <div class="comment-content">
+                    <span class="comment-author">@{latestComment.author}：</span>
+                    <span class="comment-text">{latestComment.text}</span>
+                  </div>
+                </div>
+              )}
+
+              <div class="card-footer">
+                <div class="metrics">
+                  <span title="评论数">💬 {item.commentCount} 条讨论</span>
+                  <span title="互动数">👀 {item.reactionCount}</span>
+                </div>
+                <div class="card-links">
+                  <a href={`/issue/${item.id}/`} class="link-detail">
+                    查看详情
+                  </a>
+                  <a
+                    href={item.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    class="link-github"
+                  >
+                    原贴 ↗
+                  </a>
+                </div>
+              </div>
+            </article>
+          );
+        })
+      }
+    </section>
+
+    <div id="empty-state" class="empty-state" style="display: none;">
+      当前筛选条件下暂无匹配的预警记录。
+    </div>
+
+    <div class="load-more-wrap">
+      <button id="load-more-btn" class="btn btn-ghost" style="display: none;">加载更多</button>
+    </div>
+  </div>
+</Layout>
+
+<!-- Pagefind 动态初始化 -->
+<script is:inline>
+  function setupPagefind() {
+    const el = document.getElementById('pagefind-search');
+    if (!el) return;
+
+    function mountUI() {
+      if (window.PagefindUI && !el.querySelector('.pagefind-ui')) {
+        el.innerHTML = '';
+        new window.PagefindUI({
+          element: '#pagefind-search',
+          showSubResults: false,
+          showImages: false,
+          resetStyles: false,
+          translations: {
+            placeholder: '输入机场名称、官网域名或关键词（如：失联、删库、退款）...',
+            zero_results: '未找到与“[SEARCH_TERM]”相关的跑路记录，建议核对别名或直接查看 GitHub 原仓库',
+            many_results: '共找到 [COUNT] 条相关记录',
+            one_result: '找到 1 条相关记录',
+            clear_search: '清空',
+            load_more: '加载更多结果',
+          },
+        });
+      }
+    }
+
+    if (window.PagefindUI) {
+      mountUI();
+    } else {
+      const existing = document.querySelector('script[src*="pagefind-ui.js"]');
+      if (existing) {
+        existing.addEventListener('load', mountUI);
+      } else {
+        const script = document.createElement('script');
+        script.src = '/pagefind/pagefind-ui.js';
+        script.onload = mountUI;
+        document.head.appendChild(script);
+      }
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', setupPagefind);
+  } else {
+    setupPagefind();
+  }
+</script>
+
+<!-- 前端筛选、排序与分页逻辑 -->
+<script>
+  const PAGE_SIZE = 24;
+  let currentRisk = 'all';
+  let currentDays = 'all';
+  let currentSort = 'updated';
+  let visibleLimit = PAGE_SIZE;
+
+  const grid = document.getElementById('cards-grid') as HTMLElement;
+  const allCards = Array.from(grid.querySelectorAll<HTMLElement>('.issue-card'));
+  const pills = document.querySelectorAll<HTMLButtonElement>('.pill');
+  const timeFilter = document.getElementById('time-filter') as HTMLSelectElement;
+  const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
+  const emptyState = document.getElementById('empty-state') as HTMLElement;
+  const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
+
+  function applyFilterAndSort() {
+    const now = Date.now();
+    const dayMs = 86400000;
+
+    // 1. 过滤：确保仅选中对应分类
+    const matched = allCards.filter((card) => {
+      const risk = card.dataset.risk || 'archive';
+      const updated = Number(card.dataset.updated || 0);
+
+      if (currentRisk !== 'all' && risk !== currentRisk) return false;
+      if (currentDays !== 'all') {
+        const limitMs = Number(currentDays) * dayMs;
+        if (now - updated > limitMs) return false;
+      }
+      return true;
+    });
+
+    // 2. 排序
+    matched.sort((a, b) => {
+      const key = currentSort === 'hot' ? 'hot' : currentSort === 'created' ? 'created' : 'updated';
+      return Number(b.dataset[key] || 0) - Number(a.dataset[key] || 0);
+    });
+
+    // 3. 严格显隐控制（同时设置 hidden 与 display 样式，杜绝 display:flex 样式冲突导致不生效）
+    allCards.forEach((card) => {
+      card.hidden = true;
+      card.style.display = 'none';
+    });
+
+    matched.forEach((card, index) => {
+      const isVisible = index < visibleLimit;
+      card.hidden = !isVisible;
+      card.style.display = isVisible ? 'flex' : 'none';
+      grid.appendChild(card);
+    });
+
+    const hasMatch = matched.length > 0;
+    emptyState.style.display = hasMatch ? 'none' : 'block';
+    
+    const canLoadMore = matched.length > visibleLimit;
+    loadMoreBtn.style.display = canLoadMore ? 'inline-flex' : 'none';
+    if (canLoadMore) {
+      loadMoreBtn.textContent = `加载更多（剩余 ${matched.length - visibleLimit} 条）`;
+    }
+  }
+
+  pills.forEach((pill) => {
+    pill.addEventListener('click', () => {
+      pills.forEach((p) => p.classList.remove('active'));
+      pill.classList.add('active');
+      currentRisk = pill.dataset.risk || 'all';
+      visibleLimit = PAGE_SIZE;
+      applyFilterAndSort();
+    });
+  });
+
+  timeFilter.addEventListener('change', () => {
+    currentDays = timeFilter.value;
+    visibleLimit = PAGE_SIZE;
+    applyFilterAndSort();
+  });
+
+  sortSelect.addEventListener('change', () => {
+    currentSort = sortSelect.value;
+    visibleLimit = PAGE_SIZE;
+    applyFilterAndSort();
+  });
+
+  loadMoreBtn.addEventListener('click', () => {
+    visibleLimit += PAGE_SIZE;
+    applyFilterAndSort();
+  });
+
+  // 初始渲染
+  applyFilterAndSort();
+</script>
+
+<style>
+  /* 解决 display: flex 覆盖 html5 hidden 属性的根本问题 */
+  [hidden],
+  .issue-card[hidden] {
+    display: none !important;
+  }
+
+  /* KPI 网格：无边框设计，恢复原本各卡片专属颜色与微光特效 */
+  .kpi-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 14px;
+    margin-bottom: 24px;
+  }
+
+  .kpi-card {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none; /* 无边框线 */
+    border-radius: 12px;
+    padding: 16px 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    transition: all 0.2s ease;
+  }
+
+  .kpi-card:hover {
+    transform: translateY(-2px);
+  }
+
+  /* 当前高危预警：红色特效，无边框 */
+  .kpi-danger {
+    background: linear-gradient(180deg, rgba(239, 68, 68, 0.14), var(--surface));
+    box-shadow: 0 4px 20px rgba(239, 68, 68, 0.08);
+  }
+  .kpi-danger:hover {
+    box-shadow: 0 8px 24px rgba(239, 68, 68, 0.18);
+  }
+  .kpi-danger .kpi-value {
+    color: var(--risk-high-text);
+    text-shadow: 0 0 16px rgba(239, 68, 68, 0.35);
+  }
+
+  /* 近 7 天活跃反馈：橙黄色特效，无边框 */
+  .kpi-warn {
+    background: linear-gradient(180deg, rgba(245, 158, 11, 0.14), var(--surface));
+    box-shadow: 0 4px 20px rgba(245, 158, 11, 0.08);
+  }
+  .kpi-warn:hover {
+    box-shadow: 0 8px 24px rgba(245, 158, 11, 0.18);
+  }
+  .kpi-warn .kpi-value {
+    color: var(--risk-warn-text);
+    text-shadow: 0 0 16px rgba(245, 158, 11, 0.35);
+  }
+
+  /* 累计收录线索：白色微光特效，无边框 */
+  .kpi-total {
+    background: linear-gradient(180deg, rgba(255, 255, 255, 0.10), var(--surface));
+    box-shadow: 0 4px 20px rgba(255, 255, 255, 0.06);
+  }
+  .kpi-total:hover {
+    box-shadow: 0 8px 24px rgba(255, 255, 255, 0.14);
+  }
+  .kpi-total .kpi-value {
+    color: #ffffff;
+    text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
+  }
+
+  /* 最后同步：蓝色特效，无边框 */
+  .kpi-sync {
+    background: linear-gradient(180deg, rgba(56, 189, 248, 0.08), var(--surface));
+    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.06);
+  }
+  .kpi-sync:hover {
+    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.16);
+  }
+  .kpi-sync .kpi-value {
+    color: var(--accent);
+    text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+  }
+
+  .kpi-label {
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  .kpi-value {
+    font-size: 1.75rem;
+    font-weight: 700;
+    line-height: 1.2;
+    letter-spacing: -0.02em;
+  }
+
+  .kpi-time {
+    font-size: 1.35rem;
+    padding-top: 4px;
+  }
+
+  .kpi-sub {
+    font-size: 0.76rem;
+    color: var(--text-muted);
+  }
+
+  /* 搜索区：无边框设计 */
+  .search-section {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 14px;
+    padding: 14px 20px;
+    margin-bottom: 24px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+  }
+
+  .search-bar-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 16px;
+  }
+
+  /* 调整左侧“买前搜一下”高度为 44px，与搜索框高度完全对齐 */
+  .search-title-stack {
+    display: inline-flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 44px;
+    width: 3.12rem;
+    flex-shrink: 0;
+    user-select: none;
+    box-sizing: border-box;
+    padding: 1px 0;
+  }
+
+  .title-top {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #fff;
+    line-height: 1;
+    width: 100%;
+  }
+
+  .title-bottom {
+    display: flex;
+    justify-content: space-between;
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+    width: 100%;
+  }
+
+  .search-input-wrap {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .search-placeholder-bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    height: 44px;
+    padding: 0 16px;
+    background: var(--surface);
+    border: none;
+    border-radius: 10px;
+    color: var(--text-muted);
+    font-size: 0.92rem;
+    box-sizing: border-box;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+  }
+
+  .search-placeholder-icon {
+    color: var(--accent);
+    flex-shrink: 0;
+    opacity: 0.85;
+  }
+
+  .search-placeholder-text {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    opacity: 0.75;
+  }
+
+  /* 筛选控制条 */
+  .toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 18px;
+  }
+
+  .filter-pills {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+
+  .pill {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: none;
+    background: var(--surface);
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  /* 按钮 hover 时颜色变化改为白色，无边框 */
+  .pill:hover {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.12);
+  }
+
+  /* 选中的按钮颜色变化改为白色，无边框 */
+  .pill.active {
+    background: rgba(255, 255, 255, 0.18);
+    color: #ffffff;
+    font-weight: 600;
+    box-shadow: 0 0 12px rgba(255, 255, 255, 0.14);
+  }
+
+  .pill.active:hover {
+    background: rgba(255, 255, 255, 0.24);
+    color: #ffffff;
+    box-shadow: 0 0 16px rgba(255, 255, 255, 0.24);
+  }
+
+  .pill-count {
+    font-size: 0.75rem;
+    opacity: 0.8;
+  }
+
+  .pill.active .pill-count {
+    color: #ffffff;
+    opacity: 0.95;
+  }
+
+  .toolbar-selects {
+    display: flex;
+    gap: 8px;
+  }
+
+  .toolbar-selects select {
+    background: var(--surface);
+    color: var(--text);
+    border: none;
+    border-radius: 8px;
+    padding: 6px 10px;
+    font-size: 0.84rem;
+    cursor: pointer;
+    transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .toolbar-selects select:hover {
+    color: #ffffff;
+    background: var(--surface-hover);
+  }
+
+  /* 卡片列表：无边框设计 */
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+
+  .issue-card {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 12px;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+    transition: transform 0.2s ease, background 0.15s ease, box-shadow 0.2s ease;
+  }
+
+  .issue-card:hover {
+    transform: translateY(-2px);
+    background: var(--surface-hover);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .card-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .risk-badge {
+    font-size: 0.75rem;
+    font-weight: 600;
+    padding: 2px 9px;
+    border-radius: 8px;
+    border: none;
+  }
+
+  .badge-high {
+    background: var(--risk-high-bg);
+    color: var(--risk-high-text);
+  }
+
+  .badge-warning {
+    background: var(--risk-warn-bg);
+    color: var(--risk-warn-text);
+  }
+
+  .badge-resolved {
+    background: var(--risk-ok-bg);
+    color: var(--risk-ok-text);
+  }
+
+  .badge-archive {
+    background: var(--risk-arch-bg);
+    color: var(--risk-arch-text);
+  }
+
+  .issue-meta {
+    font-size: 0.78rem;
+    color: var(--text-muted);
+  }
+
+  .card-title {
+    margin: 0;
+    font-size: 1.04rem;
+    line-height: 1.4;
+  }
+
+  .card-title a:hover {
+    color: var(--accent);
+  }
+
+  .label-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .gh-label {
+    font-size: 0.72rem;
+    padding: 1px 7px;
+    border-radius: 8px;
+    background: rgba(148, 163, 184, 0.12);
+    color: var(--text-muted);
+  }
+
+  .card-summary {
+    margin: 0;
+    font-size: 0.87rem;
+    color: #cbd5e1;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .latest-comment {
+    margin: 0;
+    padding: 8px 12px;
+    background: rgba(15, 23, 42, 0.75);
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    font-size: 0.82rem;
+  }
+
+  .comment-icon {
+    font-size: 0.85rem;
+    line-height: 1.4;
+  }
+
+  .comment-content {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    line-height: 1.45;
+  }
+
+  .comment-author {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .comment-text {
+    color: #cbd5e1;
+  }
+
+  .card-footer {
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: none;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 0.82rem;
+  }
+
+  .metrics {
+    display: flex;
+    gap: 12px;
+    color: var(--text-muted);
+  }
+
+  .card-links {
+    display: flex;
+    gap: 14px;
+  }
+
+  .link-detail {
+    color: var(--accent);
+    font-weight: 500;
+  }
+
+  .link-github {
+    color: var(--text-muted);
+  }
+
+  .link-github:hover {
+    color: var(--text);
+  }
+
+  .empty-state {
+    text-align: center;
+    padding: 48px 20px;
+    color: var(--text-muted);
+    background: var(--surface);
+    border: none;
+    border-radius: 12px;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .load-more-wrap {
+    margin-top: 24px;
+    text-align: center;
+  }
+
+  @media (max-width: 900px) {
+    .kpi-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .cards-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

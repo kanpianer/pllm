@@ -1,0 +1,265 @@
+---
+import Layout from '../../layouts/Layout.astro';
+import issues from '../../data/issues.json';
+
+export function getStaticPaths() {
+  return issues.map((item) => ({
+    params: { id: String(item.id) },
+    props: { item },
+  }));
+}
+
+const { item } = Astro.props;
+
+const riskMeta: Record<string, { label: string; className: string; icon: string }> = {
+  high: { label: '预警 / 疑似跑路', className: 'badge-high', icon: '🔴' },
+  warning: { label: '异常观察中', className: 'badge-warning', icon: '🟡' },
+  resolved: { label: '已恢复 / 误报', className: 'badge-resolved', icon: '🟢' },
+  archive: { label: '归档', className: 'badge-archive', icon: '⚪' },
+};
+
+const meta = riskMeta[item.riskLevel] || riskMeta.archive;
+---
+
+<Layout title={`${item.title} | 你的机场，跑路了吗？`} description={item.summary}>
+  <!-- 悬浮返回按钮，与回到顶部按钮UI一致、不透明、纯图标、避开页脚 -->
+  <a href="/" class="floating-back-btn" data-pagefind-ignore aria-label="返回" title="返回">
+    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+      <line x1="19" y1="12" x2="5" y2="12"></line>
+      <polyline points="12 19 5 12 12 5"></polyline>
+    </svg>
+  </a>
+
+  <article class="detail-card" data-pagefind-body>
+    <div class="detail-meta">
+      <span class={`risk-tag ${meta.className}`} data-pagefind-filter="风险等级">{meta.icon} {meta.label}</span>
+      <span class="meta-text">Issue #{item.id} · 状态：{item.state}</span>
+      <span class="meta-text">更新时间：{item.updatedAt ? item.updatedAt.slice(0, 10) : ''}</span>
+    </div>
+
+    <h1 class="detail-title">{item.title}</h1>
+
+    {item.labels && item.labels.length > 0 && (
+      <div class="tags-wrap">
+        {item.labels.map((l) => (
+          <span class="tag-chip" data-pagefind-filter="标签">{l.name}</span>
+        ))}
+      </div>
+    )}
+
+    <!-- 仅显示用户实际提交的有效内容，已剔除静态说明与指引模板 -->
+    <section class="detail-section">
+      <h2>线索提交内容</h2>
+      <div class="body-content">
+        <p class="body-text">{item.body || item.summary || '原贴未提供文字摘要，请前往 GitHub 查看原贴讨论。'}</p>
+      </div>
+    </section>
+
+    <!-- 用户评论列表展示 -->
+    {item.latestComments && item.latestComments.length > 0 ? (
+      <section class="detail-section">
+        <h2>用户最新讨论与社区跟进（共 {item.commentCount} 条讨论）</h2>
+        <ul class="comment-list">
+          {item.latestComments.map((c) => (
+            <li class="comment-item">
+              <div class="comment-head">
+                <strong class="comment-author">@{c.author}</strong>
+                <span class="comment-time">{c.createdAt ? c.createdAt.slice(0, 10) : ''}</span>
+              </div>
+              <p class="comment-body">{c.text}</p>
+            </li>
+          ))}
+        </ul>
+      </section>
+    ) : item.commentCount > 0 ? (
+      <section class="detail-section">
+        <h2>用户讨论（共 {item.commentCount} 条）</h2>
+        <p class="empty-comment-hint">
+          原帖共有 {item.commentCount} 条社区用户跟进讨论，可点击下方按钮前往 GitHub 查看完整讨论与截图。
+        </p>
+      </section>
+    ) : null}
+
+    <div class="cta-bar" data-pagefind-ignore>
+      <a
+        href={item.url}
+        target="_blank"
+        rel="noopener noreferrer"
+        class="btn btn-primary"
+      >
+        <svg class="btn-icon" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+          <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+        </svg>
+        <span>前往 GitHub 原帖查看完整截图与全部讨论 ↗</span>
+      </a>
+    </div>
+  </article>
+</Layout>
+
+<style>
+  .detail-card {
+    background: var(--surface);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: none;
+    border-radius: 14px;
+    padding: 26px;
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
+  }
+
+  .detail-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 12px;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+  }
+
+  /* 机场状态标记与主页统一，颜色保持一致，无边框 */
+  .risk-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 2px 10px;
+    border-radius: 8px;
+    font-size: 0.76rem;
+    font-weight: 600;
+    border: none;
+  }
+
+  .badge-high {
+    background: var(--risk-high-bg);
+    color: var(--risk-high-text);
+  }
+
+  .badge-warning {
+    background: var(--risk-warn-bg);
+    color: var(--risk-warn-text);
+  }
+
+  .badge-resolved {
+    background: var(--risk-ok-bg);
+    color: var(--risk-ok-text);
+  }
+
+  .badge-archive {
+    background: var(--risk-arch-bg);
+    color: var(--risk-arch-text);
+  }
+
+  .detail-title {
+    margin: 0 0 14px;
+    font-size: 1.45rem;
+    line-height: 1.35;
+  }
+
+  .tags-wrap {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 22px;
+  }
+
+  .tag-chip {
+    font-size: 0.76rem;
+    padding: 2px 9px;
+    border-radius: 8px;
+    background: rgba(148, 163, 184, 0.14);
+    color: var(--text-muted);
+    border: none;
+  }
+
+  .detail-section {
+    margin-top: 22px;
+    padding-top: 18px;
+    border-top: none;
+  }
+
+  .detail-section h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .body-content {
+    background: rgba(15, 23, 42, 0.5);
+    border: none;
+    border-radius: 10px;
+    padding: 16px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .body-text {
+    margin: 0;
+    white-space: pre-wrap;
+    color: #e2e8f0;
+    line-height: 1.7;
+    font-size: 0.92rem;
+  }
+
+  .comment-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .comment-item {
+    background: rgba(15, 23, 42, 0.65);
+    border: none;
+    border-radius: 10px;
+    padding: 14px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+  }
+
+  .comment-head {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 8px;
+  }
+
+  .comment-author {
+    color: var(--accent);
+  }
+
+  .comment-body {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.55;
+    white-space: pre-wrap;
+  }
+
+  .empty-comment-hint {
+    margin: 0;
+    font-size: 0.86rem;
+    color: var(--text-muted);
+    background: rgba(15, 23, 42, 0.4);
+    border: none;
+    border-radius: 8px;
+    padding: 12px 14px;
+  }
+
+  .cta-bar {
+    margin-top: 28px;
+    padding-top: 20px;
+    border-top: none;
+  }
+
+  .cta-bar .btn {
+    border: none;
+    background: rgba(17, 24, 39, 0.7);
+  }
+
+  .cta-bar .btn:hover {
+    color: #ffffff;
+    background: var(--surface-hover);
+    box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
+  }
+</style>

@@ -1,0 +1,65 @@
+name: 数据同步与自动部署
+
+on:
+  schedule:
+    # 每天 02:00 UTC (北京时间 10:00) 自动同步数据
+    - cron: '0 2 * * *'
+  push:
+    branches:
+      - main
+  workflow_dispatch: # 支持 GitHub 控制台手动一键触发
+
+permissions:
+  contents: write
+
+jobs:
+  sync-and-deploy:
+    name: Sync Issues & Deploy
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: 检出代码
+        uses: actions/checkout@v4
+
+      - name: 配置 Node.js 20
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: 安装项目依赖
+        run: npm ci || npm install
+
+      - name: 同步 GitHub 预警数据
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npm run sync
+
+      - name: 提交最新数据到仓库（若有变更）
+        run: |
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          if [ -n "$(git status --porcelain src/data/issues.json)" ]; then
+            git add src/data/issues.json
+            git commit -m "chore(data): 自动同步最新预警数据 [skip ci]"
+            git push
+          else
+            echo "数据无更新，无需提交。"
+          fi
+
+      - name: 构建静态站点与 Pagefind 索引
+        run: npm run build
+
+      - name: 部署至 Cloudflare Pages
+        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
+        uses: cloudflare/pages-action@v1
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        with:
+          apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+          accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+          projectName: paolu-dashboard
+          directory: dist
+          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
+          branch: main

@@ -1,0 +1,863 @@
+---
+interface Props {
+  title: string;
+  description?: string;
+}
+
+const {
+  title,
+  description = '基于社区开源数据自动同步的机场跑路预警与状态追踪看板',
+} = Astro.props;
+---
+
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <title>{title}</title>
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="shortcut icon" href="/favicon.ico" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap" rel="stylesheet" />
+    <link href="/pagefind/pagefind-ui.css" rel="stylesheet" />
+    <script src="/pagefind/pagefind-ui.js" is:inline></script>
+    <script is:inline>
+      // 优先从 localStorage 读取静态资源（字体、背景图、Logo）并立即生效
+      try {
+        const cachedFont = localStorage.getItem('paolu_static_font_lxgw');
+        if (cachedFont) {
+          const style = document.createElement('style');
+          style.id = 'cached-font-lxgw';
+          style.textContent = cachedFont;
+          document.head.appendChild(style);
+        }
+        const cachedBg = localStorage.getItem('paolu_static_bg');
+        if (cachedBg) {
+          document.documentElement.style.setProperty('--bg-art-image', 'url(' + cachedBg + ')');
+        }
+        const cachedLogo = localStorage.getItem('paolu_static_logo');
+        if (cachedLogo) {
+          window.__CACHED_LOGO__ = cachedLogo;
+        }
+      } catch (e) {}
+    </script>
+  </head>
+  <body>
+    <!-- 屏幕中心固定跑路背景图（以人为中心，向四周平滑径向淡化） -->
+    <div class="fixed-bg-art" aria-hidden="true"></div>
+
+    <header class="site-header" data-pagefind-ignore>
+      <div class="container header-inner">
+        <a href="/" class="brand" aria-label="你的机场，跑路了吗？首页">
+          <img src="/icons/logo-white.png" alt="跑路预警 Logo" class="brand-logo" width="34" height="34" />
+          <script is:inline>
+            if (window.__CACHED_LOGO__) {
+              const img = document.querySelector('.brand-logo');
+              if (img) img.src = window.__CACHED_LOGO__;
+            }
+          </script>
+          <div class="brand-info">
+            <span class="brand-title">你的机场，跑路了吗？</span>
+          </div>
+        </a>
+        <div class="header-actions">
+          <a
+            href="https://github.com/limbopro/Paolujichang/issues/new/choose"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="btn btn-ghost"
+          >
+            <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <line x1="12" y1="5" x2="12" y2="19"></line>
+              <line x1="5" y1="12" x2="19" y2="12"></line>
+            </svg>
+            <span>提交跑路线索</span>
+          </a>
+        </div>
+      </div>
+    </header>
+
+    <main class="container main-content">
+      <slot />
+    </main>
+
+    <!-- 回到顶部悬浮按钮（纯图标设计） -->
+    <button id="back-to-top" class="back-to-top" aria-label="回到顶部" title="回到顶部">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M18 15l-6-6-6 6"/>
+      </svg>
+    </button>
+
+    <!-- 首次访问提示弹窗 -->
+    <div id="first-visit-modal" class="modal-backdrop" aria-hidden="true" role="dialog" aria-modal="true" data-pagefind-ignore>
+      <div class="modal-card">
+        <div class="modal-header">
+          <div class="modal-badge">
+            <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <circle cx="12" cy="12" r="10"></circle>
+              <line x1="12" y1="16" x2="12" y2="12"></line>
+              <line x1="12" y1="8" x2="12.01" y2="8"></line>
+            </svg>
+            <span>访问提示</span>
+          </div>
+          <button id="modal-close-btn" class="modal-close-icon" aria-label="关闭提示">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <line x1="18" y1="6" x2="6" y2="18"></line>
+              <line x1="6" y1="6" x2="18" y2="18"></line>
+            </svg>
+          </button>
+        </div>
+        <div class="modal-body">
+          <p class="modal-lead">
+            上榜的机场不代表真的就跑路了，但可以看到某机场在不同用户使用中的表现，具体需要根据用户反馈自行判断，一般反馈的越多，信息越准确。
+          </p>
+          <p class="modal-meta-line">
+            本站数据来自：<a href="https://github.com/limbopro/Paolujichang" target="_blank" rel="noopener noreferrer" class="modal-gh-link"><svg class="inline-gh-svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg><span>Paolujichang</span></a>，你可以到 <a href="https://github.com/limbopro/Paolujichang/issues/new/choose" target="_blank" rel="noopener noreferrer" class="modal-action-link">这里</a> 提交跑路线索。
+          </p>
+        </div>
+        <div class="modal-footer">
+          <button id="modal-confirm-btn" class="btn btn-ghost modal-btn-confirm">
+            <svg class="btn-icon" width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+              <polyline points="20 6 9 17 4 12"></polyline>
+            </svg>
+            <span>我知道了</span>
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <footer class="site-footer" data-pagefind-ignore>
+      <div class="container">
+        <p class="disclaimer">
+          免责声明：本站数据自动同步自开源社区
+          <a href="https://github.com/limbopro/Paolujichang" target="_blank" rel="noopener noreferrer">
+            limbopro/Paolujichang
+          </a>
+          ，仅作公开信息聚合展示与风险提示，不构成任何定性结论或消费建议。如相关运营方认为存在误报或已恢复服务，请直接前往原
+          GitHub Issue 举证申诉，社区关闭或更新标签后本站将自动同步。
+        </p>
+      </div>
+    </footer>
+
+    <script is:inline>
+      // 悬浮按钮（回到顶部与返回按钮）：位置终固定不变，仅在网页滚动时显示，显示2.2秒后自动消失
+      let hideTimer = null;
+      let isHovering = false;
+
+      function getFloatingButtons() {
+        return {
+          btt: document.getElementById('back-to-top'),
+          back: document.querySelector('.floating-back-btn'),
+        };
+      }
+
+      function showFloatingButtons() {
+        const { btt, back } = getFloatingButtons();
+        if (btt && window.scrollY > 0) {
+          btt.classList.add('visible');
+        }
+        if (back) {
+          back.classList.add('visible');
+        }
+      }
+
+      function hideFloatingButtons() {
+        if (isHovering) return;
+        const { btt, back } = getFloatingButtons();
+        if (btt) btt.classList.remove('visible');
+        if (back) back.classList.remove('visible');
+      }
+
+      function handleScrollActivity() {
+        showFloatingButtons();
+        if (hideTimer) clearTimeout(hideTimer);
+        hideTimer = setTimeout(() => {
+          hideFloatingButtons();
+        }, 2200);
+      }
+
+      window.addEventListener('scroll', handleScrollActivity, { passive: true });
+
+      function bindButtonHover(btn) {
+        if (!btn) return;
+        btn.addEventListener('mouseenter', () => {
+          isHovering = true;
+          if (hideTimer) clearTimeout(hideTimer);
+        });
+        btn.addEventListener('mouseleave', () => {
+          isHovering = false;
+          if (hideTimer) clearTimeout(hideTimer);
+          hideTimer = setTimeout(() => {
+            hideFloatingButtons();
+          }, 2200);
+        });
+      }
+
+      const initialBtns = getFloatingButtons();
+      bindButtonHover(initialBtns.btt);
+      bindButtonHover(initialBtns.back);
+
+      if (initialBtns.btt) {
+        initialBtns.btt.addEventListener('click', () => {
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+      }
+
+      // 首次访问弹窗提示逻辑
+      const modal = document.getElementById('first-visit-modal');
+      const closeBtn = document.getElementById('modal-close-btn');
+      const confirmBtn = document.getElementById('modal-confirm-btn');
+
+      function dismissNoticeModal() {
+        if (modal) {
+          modal.classList.remove('active');
+          try {
+            localStorage.setItem('paolu_notice_seen_v2', 'true');
+          } catch (e) {}
+        }
+      }
+
+      try {
+        if (modal && !localStorage.getItem('paolu_notice_seen_v2')) {
+          setTimeout(() => {
+            modal.classList.add('active');
+          }, 240);
+        }
+      } catch (e) {}
+
+      if (closeBtn) closeBtn.addEventListener('click', dismissNoticeModal);
+      if (confirmBtn) confirmBtn.addEventListener('click', dismissNoticeModal);
+      if (modal) {
+        modal.addEventListener('click', (e) => {
+          if (e.target === modal) dismissNoticeModal();
+        });
+      }
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && modal && modal.classList.contains('active')) {
+          dismissNoticeModal();
+        }
+      });
+
+      // 首次访问将静态资源（字体样式、Logo、背景图片）保存至 localStorage，提升下次秒开速度
+      window.addEventListener('load', () => {
+        const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1000));
+        idle(() => {
+          // 1. 缓存谷歌字体 LXGW WenKai 样式表
+          try {
+            if (!localStorage.getItem('paolu_static_font_lxgw')) {
+              fetch('https://fonts.googleapis.com/css2?family=LXGW+WenKai+TC:wght@300;400;700&display=swap')
+                .then((r) => (r.ok ? r.text() : null))
+                .then((css) => {
+                  if (css && css.includes('@font-face')) {
+                    localStorage.setItem('paolu_static_font_lxgw', css);
+                  }
+                })
+                .catch(() => {});
+            }
+          } catch (e) {}
+
+          // 2. 缓存站点 Logo 为 Base64 Data URL
+          try {
+            if (!localStorage.getItem('paolu_static_logo')) {
+              fetch('/icons/logo-white.png')
+                .then((r) => (r.ok ? r.blob() : null))
+                .then((blob) => {
+                  if (!blob) return;
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    try {
+                      if (reader.result) localStorage.setItem('paolu_static_logo', reader.result);
+                    } catch (e) {}
+                  };
+                  reader.readAsDataURL(blob);
+                })
+                .catch(() => {});
+            }
+          } catch (e) {}
+
+          // 3. 缓存固定跑路背景图为 Base64 Data URL
+          try {
+            if (!localStorage.getItem('paolu_static_bg')) {
+              fetch('/images/bg-runner.jpg')
+                .then((r) => (r.ok ? r.blob() : null))
+                .then((blob) => {
+                  if (!blob) return;
+                  const reader = new FileReader();
+                  reader.onloadend = () => {
+                    try {
+                      if (reader.result) localStorage.setItem('paolu_static_bg', reader.result);
+                    } catch (e) {}
+                  };
+                  reader.readAsDataURL(blob);
+                })
+                .catch(() => {});
+            }
+          } catch (e) {}
+        });
+      });
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --bg: #0b1120;
+    --surface: rgba(17, 24, 39, 0.72);
+    --surface-hover: rgba(23, 32, 51, 0.84);
+    --surface-solid: #111827;
+    --border: #1f2937;
+    --border-strong: #334155;
+    --text: #f1f5f9;
+    --text-muted: #94a3b8;
+    --accent: #38bdf8;
+
+    /* 跑路中心固定背景图配置 */
+    --bg-art-image: url('/images/bg-runner.jpg');
+    --bg-art-opacity: 0.42;
+    --bg-art-size: min(780px, 86vw);
+
+    --risk-high-bg: rgba(239, 68, 68, 0.14);
+    --risk-high-text: #fca5a5;
+    --risk-high-border: rgba(239, 68, 68, 0.35);
+
+    --risk-warn-bg: rgba(245, 158, 11, 0.14);
+    --risk-warn-text: #fcd34d;
+    --risk-warn-border: rgba(245, 158, 11, 0.35);
+
+    --risk-ok-bg: rgba(16, 185, 129, 0.14);
+    --risk-ok-text: #6ee7b7;
+    --risk-ok-border: rgba(16, 185, 129, 0.35);
+
+    --risk-arch-bg: rgba(148, 163, 184, 0.12);
+    --risk-arch-text: #cbd5e1;
+    --risk-arch-border: rgba(148, 163, 184, 0.25);
+
+    /* Pagefind 深色主题适配变量 */
+    --pagefind-ui-scale: 0.92;
+    --pagefind-ui-primary: #38bdf8;
+    --pagefind-ui-text: #f1f5f9;
+    --pagefind-ui-background: #111827;
+    --pagefind-ui-border: transparent;
+    --pagefind-ui-tag: #1e293b;
+    --pagefind-ui-border-width: 0px;
+    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-font: 'LXGW WenKai', 'LXGW WenKai TC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  }
+
+  * {
+    box-sizing: border-box;
+  }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'LXGW WenKai', 'LXGW WenKai TC', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .container {
+    width: 100%;
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    background: rgba(11, 17, 32, 0.88);
+    backdrop-filter: blur(12px);
+    border-bottom: none;
+  }
+
+  .header-inner {
+    height: 68px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .brand-logo {
+    width: 36px;
+    height: 36px;
+    object-fit: contain;
+    flex-shrink: 0;
+    transition: transform 0.22s cubic-bezier(0.34, 1.56, 0.64, 1), filter 0.2s ease;
+  }
+
+  .brand:hover .brand-logo {
+    transform: scale(1.1) rotate(-3deg);
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.45));
+  }
+
+  .brand-info {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .brand-title {
+    font-weight: 800;
+    font-size: 1.38rem;
+    letter-spacing: -0.02em;
+    color: #fff;
+    line-height: 1.1;
+  }
+
+  /* 副标题：纯文本无边框无框框，金橙预警色 */
+  .brand-subtitle {
+    font-size: 0.88rem;
+    font-weight: 500;
+    color: #fbbf24;
+    letter-spacing: 0.03em;
+    line-height: 1.2;
+    background: none !important;
+    border: none !important;
+    box-shadow: none !important;
+    outline: none !important;
+    padding: 0 !important;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    transition: all 0.15s ease;
+    cursor: pointer;
+    line-height: 1;
+  }
+
+  .btn-icon {
+    flex-shrink: 0;
+  }
+
+  .btn-ghost {
+    color: var(--text-muted);
+    border: none;
+    background: rgba(17, 24, 39, 0.6);
+  }
+
+  .btn-ghost:hover {
+    color: #ffffff;
+    background: var(--surface-hover);
+  }
+
+  /* 屏幕中心固定跑路背景图：始终固定于视口中心，以人物为中心向外辐射渐变淡化，无硬边界 */
+  .fixed-bg-art {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: var(--bg-art-size);
+    height: var(--bg-art-size);
+    background-image: var(--bg-art-image);
+    background-repeat: no-repeat;
+    background-position: center center;
+    background-size: contain;
+    pointer-events: none;
+    z-index: 0;
+    opacity: var(--bg-art-opacity);
+    /* 以人为视觉中心（50% 50%），向四周径向渐变淡化，完全消除图像方形边缘 */
+    -webkit-mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.95) 18%, rgba(0, 0, 0, 0.5) 45%, transparent 72%);
+    mask-image: radial-gradient(circle at 50% 50%, rgba(0, 0, 0, 0.95) 18%, rgba(0, 0, 0, 0.5) 45%, transparent 72%);
+  }
+
+  .main-content {
+    position: relative;
+    z-index: 1;
+    padding-top: 28px;
+    padding-bottom: 28px;
+    min-height: auto;
+  }
+
+  /* 悬浮操作按钮规范（回到顶部与返回按钮）：UI完全一致、纯深色不透明、纯图标、无框线、位置终固定不变、滚动时显示2.2秒后消失 */
+  .back-to-top,
+  .floating-back-btn {
+    position: fixed;
+    bottom: 28px;
+    z-index: 99;
+    width: 44px;
+    height: 44px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: #111827; /* 纯深色完全不透明 */
+    color: var(--text);
+    border: none;
+    border-radius: 12px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45);
+    user-select: none;
+    -webkit-user-select: none;
+    text-decoration: none;
+    line-height: 1;
+    padding: 0;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(8px);
+    transition: opacity 0.25s ease, visibility 0.25s ease, transform 0.25s ease, background 0.15s ease, color 0.15s ease, box-shadow 0.15s ease;
+  }
+
+  .back-to-top {
+    right: max(20px, calc((100vw - 1120px) / 2 + 20px));
+  }
+
+  .floating-back-btn {
+    left: max(20px, calc((100vw - 1120px) / 2 + 20px));
+  }
+
+  .back-to-top.visible,
+  .floating-back-btn.visible {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* 悬浮按钮 hover 时颜色变化改为纯白，无框线 */
+  .back-to-top:hover,
+  .floating-back-btn:hover {
+    background: #1f2937;
+    color: #ffffff;
+    box-shadow: 0 6px 20px rgba(255, 255, 255, 0.18);
+    transform: translateY(-3px);
+  }
+
+  .back-to-top svg,
+  .floating-back-btn svg {
+    display: block;
+    flex-shrink: 0;
+  }
+
+  /* Pagefind 全局深度定制：彻底移除外边框线 */
+  .pagefind-ui__search-input {
+    color: #ffffff !important;
+    font-size: 0.92rem !important;
+    height: 44px !important;
+    padding: 0 54px 0 42px !important;
+    background-color: var(--pagefind-ui-background) !important;
+    border: none !important;
+    border-radius: 10px !important;
+    font-weight: 500 !important;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+  }
+
+  .pagefind-ui__search-input::placeholder {
+    color: var(--text-muted) !important;
+    opacity: 0.65 !important;
+    font-weight: 400 !important;
+  }
+
+  .pagefind-ui__search-input:focus {
+    outline: none !important;
+    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+  }
+
+  /* 搜索图标定位垂直居中 */
+  .pagefind-ui__form:before {
+    width: 16px !important;
+    height: 16px !important;
+    top: 14px !important;
+    left: 14px !important;
+    background-color: var(--accent) !important;
+    opacity: 0.85 !important;
+  }
+
+  /* 重新设计搜索框清空按钮：无外框 */
+  .pagefind-ui__search-clear {
+    top: 50% !important;
+    transform: translateY(-50%) !important;
+    right: 8px !important;
+    height: 28px !important;
+    padding: 0 10px !important;
+    border-radius: 6px !important;
+    background: rgba(30, 41, 59, 0.85) !important;
+    border: none !important;
+    color: var(--text-muted) !important;
+    font-size: 0.78rem !important;
+    font-weight: 500 !important;
+    line-height: 1 !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    cursor: pointer !important;
+    transition: all 0.15s ease !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+  }
+
+  .pagefind-ui__search-clear:hover {
+    color: #ffffff !important;
+    background: rgba(239, 68, 68, 0.25) !important;
+    box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
+  }
+
+  /* 搜索结果过滤内容框：无外框 */
+  .pagefind-ui__filter-panel {
+    border: none !important;
+    border-radius: 10px !important;
+    background: var(--surface) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    padding: 6px 16px 10px !important;
+    margin-top: 14px !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+  }
+
+  .pagefind-ui__filter-panel-label {
+    display: none !important;
+  }
+
+  .pagefind-ui__filter-block {
+    border-bottom: none !important;
+    padding: 12px 0 !important;
+  }
+
+  .pagefind-ui__filter-block:last-of-type {
+    border-bottom: none !important;
+  }
+
+  .pagefind-ui__filter-name {
+    color: var(--text) !important;
+    font-size: 0.88rem !important;
+    font-weight: 600 !important;
+  }
+
+  .pagefind-ui__filter-value {
+    color: var(--text-muted) !important;
+    font-size: 0.84rem !important;
+  }
+
+  /* 首次访问提示弹窗样式 */
+  .modal-backdrop {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(3, 7, 18, 0.72);
+    backdrop-filter: blur(8px);
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+
+  .modal-backdrop.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .modal-card {
+    position: relative;
+    width: 100%;
+    max-width: 520px;
+    background: var(--surface-solid);
+    border: none;
+    border-radius: 16px;
+    padding: 24px;
+    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6);
+    transform: scale(0.95) translateY(8px);
+    transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+
+  .modal-backdrop.active .modal-card {
+    transform: scale(1) translateY(0);
+  }
+
+  .modal-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+
+  .modal-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    line-height: 1;
+    color: var(--text-muted);
+    border: none;
+    background: rgba(17, 24, 39, 0.6);
+    user-select: none;
+  }
+
+  .modal-close-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border: none;
+    border-radius: 8px;
+    background: rgba(17, 24, 39, 0.6);
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: all 0.15s ease;
+  }
+
+  .modal-close-icon:hover {
+    color: #ffffff;
+    background: var(--surface-hover);
+  }
+
+  .modal-body {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    margin-bottom: 22px;
+  }
+
+  .modal-lead {
+    margin: 0;
+    font-size: 0.94rem;
+    line-height: 1.65;
+    color: #e2e8f0;
+  }
+
+  .modal-meta-line {
+    margin: 0;
+    font-size: 0.88rem;
+    line-height: 1.65;
+    color: var(--text-muted);
+  }
+
+  .modal-gh-link {
+    display: inline;
+    color: var(--text);
+    font-weight: 500;
+    text-decoration: none;
+    transition: color 0.15s ease;
+  }
+
+  .modal-gh-link:hover {
+    color: var(--accent);
+  }
+
+  .modal-gh-link span {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .inline-gh-svg {
+    display: inline-block;
+    vertical-align: -0.16em;
+    margin-right: 3px;
+    flex-shrink: 0;
+  }
+
+  .modal-action-link {
+    color: var(--accent);
+    font-weight: 500;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .modal-action-link:hover {
+    color: #7dd3fc;
+  }
+
+  .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+  }
+
+  .modal-btn-confirm {
+    padding: 8px 16px;
+    border-radius: 8px;
+    border: none;
+    color: var(--text);
+  }
+
+  .modal-btn-confirm:hover {
+    color: #ffffff;
+    background: var(--surface-hover);
+  }
+
+  .site-footer {
+    position: relative;
+    z-index: 1;
+    border-top: none;
+    padding: 24px 0 36px;
+  }
+
+  .disclaimer {
+    margin: 0;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    line-height: 1.7;
+  }
+
+  .disclaimer a {
+    color: var(--accent);
+    text-decoration: underline;
+  }
+
+  @media (max-width: 640px) {
+    .main-content {
+      padding-top: 20px;
+      padding-bottom: 20px;
+    }
+    .header-inner {
+      height: auto;
+      padding: 12px 0;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 12px;
+    }
+    .header-actions {
+      width: 100%;
+      justify-content: flex-start;
+    }
+    .back-to-top {
+      right: 18px;
+      bottom: 20px;
+      width: 40px;
+      height: 40px;
+    }
+    .floating-back-btn {
+      left: 18px;
+      bottom: 20px;
+      width: 40px;
+      height: 40px;
+    }
+  }
+</style>

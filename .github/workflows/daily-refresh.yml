@@ -16,6 +16,9 @@ jobs:
   sync-and-deploy:
     name: Sync Issues & Deploy
     runs-on: ubuntu-latest
+    env:
+      CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
+      CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
     steps:
       - name: 检出代码
@@ -51,15 +54,16 @@ jobs:
         run: npm run build
 
       - name: 部署至 Cloudflare Pages
-        if: env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != ''
-        uses: cloudflare/pages-action@v1
-        env:
-          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
-          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+        if: ${{ env.CLOUDFLARE_API_TOKEN != '' && env.CLOUDFLARE_ACCOUNT_ID != '' }}
+        uses: cloudflare/wrangler-action@v3
         with:
           apiToken: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           accountId: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
-          projectName: paolu-dashboard
-          directory: dist
-          gitHubToken: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
+          command: pages deploy dist --project-name=paolu-dashboard --branch=${{ github.ref_name }}
+
+      - name: 未配置 Cloudflare 凭据说明
+        if: ${{ env.CLOUDFLARE_API_TOKEN == '' || env.CLOUDFLARE_ACCOUNT_ID == '' }}
+        run: |
+          echo "提示：未在仓库 Secrets 中配置 CLOUDFLARE_API_TOKEN 或 CLOUDFLARE_ACCOUNT_ID。"
+          echo "若您已在 Cloudflare Pages 控制台直接关联 GitHub 仓库（方案 A），最新提交推送后 Cloudflare 会自动完成构建部署。"
+          echo "若您希望直接通过 GitHub Actions 进行部署（方案 B），请在仓库 Settings -> Secrets and variables -> Actions 中添加上述密钥。"

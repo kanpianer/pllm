@@ -180,7 +180,7 @@ function detectRiskLevel(issue) {
 /**
  * 抓取仓库范围内的最新用户评论并按 Issue 归集
  */
-async function fetchRepoComments(maxPages = 4) {
+async function fetchRepoComments(maxPages = 15) {
   console.log('💬 正在抓取社区最新用户评论...');
   const commentsByIssue = new Map();
 
@@ -200,8 +200,8 @@ async function fetchRepoComments(maxPages = 4) {
         }
 
         const list = commentsByIssue.get(issueId);
-        // 每个 issue 最多保留 5 条最新评论
-        if (list.length < 5) {
+        // 每个 issue 最多保留 15 条最新评论
+        if (list.length < 15) {
           list.push({
             author: c.user?.login || '匿名用户',
             text: c.body
@@ -268,8 +268,19 @@ async function sync() {
     return;
   }
 
+  // 1.5 读取已有数据以便继承历史评论
+  const existingIssuesMap = new Map();
+  if (fs.existsSync(OUTPUT_FILE)) {
+    try {
+      const prev = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
+      for (const item of prev) {
+        existingIssuesMap.set(item.id, item);
+      }
+    } catch (e) {}
+  }
+
   // 2. 抓取最新评论
-  const commentsMap = await fetchRepoComments(5);
+  const commentsMap = await fetchRepoComments(GITHUB_TOKEN ? 20 : 10);
 
   // 3. 组装格式化数据
   const formattedIssues = issuesOnly.map((issue) => {
@@ -292,7 +303,16 @@ async function sync() {
       };
     });
 
-    const comments = commentsMap.get(issue.number) || [];
+    const freshComments = commentsMap.get(issue.number) || [];
+    const prevComments = existingIssuesMap.get(issue.number)?.latestComments || [];
+    const mergedComments = [...freshComments];
+    for (const pc of prevComments) {
+      if (!mergedComments.some((fc) => fc.createdAt === pc.createdAt || fc.text === pc.text)) {
+        mergedComments.push(pc);
+      }
+    }
+    mergedComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
+    const comments = mergedComments.slice(0, 15);
 
     return {
       id: issue.number,

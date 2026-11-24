@@ -21,15 +21,7 @@ const riskMeta: Record<string, { label: string; className: string; icon: string 
 const meta = riskMeta[item.riskLevel] || riskMeta.archive;
 ---
 
-<Layout title={`${item.title} | 你的机场，跑路了吗？`} description={item.summary}>
-  <!-- 悬浮返回按钮，与回到顶部按钮UI一致、不透明、纯图标、避开页脚 -->
-  <a href="/" class="floating-back-btn" data-pagefind-ignore aria-label="返回" title="返回">
-    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <line x1="19" y1="12" x2="5" y2="12"></line>
-      <polyline points="12 19 5 12 12 5"></polyline>
-    </svg>
-  </a>
-
+<Layout title={`${item.title} | 你的机场，跑路了吗？`} description={item.summary} showBackBtn={true}>
   <article class="detail-card" data-pagefind-body>
     <div class="detail-meta">
       <span class={`risk-tag ${meta.className}`} data-pagefind-filter="风险等级">{meta.icon} {meta.label}</span>
@@ -60,7 +52,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       <section class="detail-section">
         <h2>用户最新讨论与社区跟进（共 {item.commentCount} 条讨论）</h2>
         <ul class="comment-list">
-          {item.latestComments.map((c) => (
+          {item.latestComments.slice(0, 15).map((c) => (
             <li class="comment-item">
               <div class="comment-head">
                 <strong class="comment-author">@{c.author}</strong>
@@ -94,49 +86,6 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       </a>
     </div>
   </article>
-
-  <script is:inline>
-    // 从详情页返回主页优化：优先使用 history.back() 触发浏览器内存级 bfcache 秒开，不重新拉取远端内容
-    function setupDetailBack() {
-      const isFromSameSite = () => {
-        try {
-          return (
-            window.history.length > 1 &&
-            document.referrer &&
-            new URL(document.referrer).origin === window.location.origin
-          );
-        } catch (e) {
-          return false;
-        }
-      };
-
-      const backBtn = document.querySelector('.floating-back-btn');
-      if (backBtn) {
-        backBtn.addEventListener('click', (e) => {
-          if (isFromSameSite()) {
-            e.preventDefault();
-            window.history.back();
-          }
-        });
-      }
-
-      const brandLogoLink = document.querySelector('.site-header .brand');
-      if (brandLogoLink) {
-        brandLogoLink.addEventListener('click', (e) => {
-          if (isFromSameSite()) {
-            e.preventDefault();
-            window.history.back();
-          }
-        });
-      }
-    }
-
-    if (document.readyState === 'loading') {
-      document.addEventListener('DOMContentLoaded', setupDetailBack);
-    } else {
-      setupDetailBack();
-    }
-  </script>
 </Layout>
 
 <style>

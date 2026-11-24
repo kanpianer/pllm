@@ -109,12 +109,20 @@ function formatDate(iso: string) {
           <div class="title-bottom"><span>搜</span><span>一</span><span>下</span></div>
         </div>
         <div id="pagefind-search" class="search-input-wrap">
-          <div class="search-placeholder-bar" aria-hidden="true">
+          <div class="search-placeholder-bar">
             <svg class="search-placeholder-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <circle cx="11" cy="11" r="8"></circle>
               <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
             </svg>
-            <span class="search-placeholder-text">输入机场名称、官网域名或关键词（如：失联、删库、退款）...</span>
+            <input
+              type="text"
+              id="search-fallback-input"
+              class="search-fallback-input"
+              placeholder="输入机场名称、官网域名或关键词（如：失联、删库、退款）..."
+              aria-label="站内搜索"
+              autocomplete="off"
+              spellcheck="false"
+            />
           </div>
         </div>
       </div>
@@ -164,6 +172,13 @@ function formatDate(iso: string) {
           const createdTs = new Date(item.createdAt).getTime();
           const hotScore = item.commentCount * 2 + item.reactionCount;
           const latestComment = item.latestComments && item.latestComments[0];
+          const searchTokens = [
+            `#${item.id}`,
+            item.title,
+            item.summary || '',
+            ...(item.labels || []).map((l) => l.name),
+            latestComment ? `${latestComment.author} ${latestComment.text}` : '',
+          ].join(' ').toLowerCase();
 
           return (
             <article
@@ -172,6 +187,7 @@ function formatDate(iso: string) {
               data-updated={updatedTs}
               data-created={createdTs}
               data-hot={hotScore}
+              data-search-text={searchTokens}
             >
               <div class="card-top">
                 <span class={`risk-badge ${meta.className}`}>{meta.label}</span>
@@ -220,8 +236,12 @@ function formatDate(iso: string) {
                     target="_blank"
                     rel="noopener noreferrer"
                     class="link-github"
+                    title="在 GitHub 查看原贴"
                   >
-                    原贴 ↗
+                    <svg class="gh-icon" width="13" height="13" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
+                      <path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/>
+                    </svg>
+                    <span>原贴 ↗</span>
                   </a>
                 </div>
               </div>
@@ -249,9 +269,14 @@ function formatDate(iso: string) {
 
     function mountUI() {
       if (window.PagefindUI && !el.querySelector('.pagefind-ui')) {
+        const fallbackInput = el.querySelector('input');
+        const initialVal = fallbackInput ? fallbackInput.value : '';
+        const wasFocused = document.activeElement === fallbackInput;
+
         el.innerHTML = '';
         new window.PagefindUI({
           element: '#pagefind-search',
+          bundlePath: '/pagefind/',
           showSubResults: false,
           showImages: false,
           resetStyles: false,
@@ -264,12 +289,34 @@ function formatDate(iso: string) {
             load_more: '加载更多结果',
           },
         });
+
+        const newInput = el.querySelector('input');
+        if (newInput) {
+          if (initialVal) {
+            newInput.value = initialVal;
+            newInput.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+          if (wasFocused) {
+            newInput.focus();
+          }
+        }
       }
     }
 
     if (window.PagefindUI) {
       mountUI();
     } else {
+      let attempts = 0;
+      const timer = setInterval(() => {
+        attempts++;
+        if (window.PagefindUI) {
+          clearInterval(timer);
+          mountUI();
+        } else if (attempts >= 80) {
+          clearInterval(timer);
+        }
+      }, 50);
+
       const existing = document.querySelector('script[src*="pagefind-ui.js"]');
       if (existing) {
         existing.addEventListener('load', mountUI);
@@ -295,6 +342,7 @@ function formatDate(iso: string) {
   let currentRisk = 'all';
   let currentDays = 'all';
   let currentSort = 'updated';
+  let currentQuery = '';
   let visibleLimit = PAGE_SIZE;
 
   const grid = document.getElementById('cards-grid') as HTMLElement;
@@ -304,12 +352,14 @@ function formatDate(iso: string) {
   const sortSelect = document.getElementById('sort-select') as HTMLSelectElement;
   const emptyState = document.getElementById('empty-state') as HTMLElement;
   const loadMoreBtn = document.getElementById('load-more-btn') as HTMLButtonElement;
+  const searchWrap = document.getElementById('pagefind-search');
 
   function applyFilterAndSort() {
     const now = Date.now();
     const dayMs = 86400000;
+    const queryTerms = currentQuery ? currentQuery.toLowerCase().split(/\s+/).filter(Boolean) : [];
 
-    // 1. 过滤：确保仅选中对应分类
+    // 1. 过滤：分类、时间范围与关键词检索
     const matched = allCards.filter((card) => {
       const risk = card.dataset.risk || 'archive';
       const updated = Number(card.dataset.updated || 0);
@@ -319,6 +369,13 @@ function formatDate(iso: string) {
         const limitMs = Number(currentDays) * dayMs;
         if (now - updated > limitMs) return false;
       }
+
+      if (queryTerms.length > 0) {
+        const searchText = (card.dataset.searchText || card.textContent || '').toLowerCase();
+        const matchesAll = queryTerms.every((term) => searchText.includes(term));
+        if (!matchesAll) return false;
+      }
+
       return true;
     });
 
@@ -343,12 +400,48 @@ function formatDate(iso: string) {
 
     const hasMatch = matched.length > 0;
     emptyState.style.display = hasMatch ? 'none' : 'block';
+    if (!hasMatch) {
+      if (currentQuery) {
+        emptyState.textContent = `未找到与“${currentQuery}”相关的预警记录。`;
+      } else {
+        emptyState.textContent = '当前筛选条件下暂无匹配的预警记录。';
+      }
+    }
     
     const canLoadMore = matched.length > visibleLimit;
     loadMoreBtn.style.display = canLoadMore ? 'inline-flex' : 'none';
     if (canLoadMore) {
       loadMoreBtn.textContent = `加载更多（剩余 ${matched.length - visibleLimit} 条）`;
     }
+  }
+
+  // 绑定搜索输入事件（兼容 PagefindUI 渲染前后的 input）
+  if (searchWrap) {
+    searchWrap.addEventListener('input', (e) => {
+      const target = e.target as HTMLInputElement;
+      if (target && target.tagName === 'INPUT') {
+        currentQuery = target.value.trim();
+        visibleLimit = PAGE_SIZE;
+        applyFilterAndSort();
+      }
+    });
+
+    searchWrap.addEventListener('click', (e) => {
+      const target = e.target as HTMLElement;
+      if (target.closest('.pagefind-ui__search-clear')) {
+        currentQuery = '';
+        visibleLimit = PAGE_SIZE;
+        applyFilterAndSort();
+      }
+    });
+
+    searchWrap.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        currentQuery = '';
+        visibleLimit = PAGE_SIZE;
+        applyFilterAndSort();
+      }
+    });
   }
 
   pills.forEach((pill) => {
@@ -407,6 +500,15 @@ function formatDate(iso: string) {
         if (timeFilter) timeFilter.value = currentDays;
         if (sortSelect) sortSelect.value = currentSort;
 
+        if (state.query) {
+          currentQuery = state.query;
+          const inp = searchWrap?.querySelector<HTMLInputElement>('input');
+          if (inp) {
+            inp.value = currentQuery;
+            inp.dispatchEvent(new Event('input', { bubbles: true }));
+          }
+        }
+
         if (state.scroll) {
           requestAnimationFrame(() => {
             window.scrollTo({ top: Number(state.scroll), behavior: 'instant' });
@@ -425,6 +527,7 @@ function formatDate(iso: string) {
           risk: currentRisk,
           days: currentDays,
           sort: currentSort,
+          query: currentQuery,
           limit: visibleLimit,
           scroll: window.scrollY,
         })
@@ -515,17 +618,17 @@ function formatDate(iso: string) {
     text-shadow: 0 0 16px rgba(255, 255, 255, 0.35);
   }
 
-  /* 最后同步：蓝色特效，无边框 */
+  /* 最后同步：绿色特效，无边框 */
   .kpi-sync {
-    background: linear-gradient(180deg, rgba(56, 189, 248, 0.08), var(--surface));
-    box-shadow: 0 4px 20px rgba(56, 189, 248, 0.06);
+    background: linear-gradient(180deg, rgba(16, 185, 129, 0.14), var(--surface));
+    box-shadow: 0 4px 20px rgba(16, 185, 129, 0.08);
   }
   .kpi-sync:hover {
-    box-shadow: 0 8px 24px rgba(56, 189, 248, 0.16);
+    box-shadow: 0 8px 24px rgba(16, 185, 129, 0.18);
   }
   .kpi-sync .kpi-value {
     color: var(--accent);
-    text-shadow: 0 0 16px rgba(56, 189, 248, 0.35);
+    text-shadow: 0 0 16px rgba(16, 185, 129, 0.35);
   }
 
   .kpi-label {
@@ -621,6 +724,32 @@ function formatDate(iso: string) {
     font-size: 0.92rem;
     box-sizing: border-box;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
+  }
+
+  .search-fallback-input {
+    flex: 1;
+    min-width: 0;
+    height: 100%;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: #ffffff;
+    font-size: 16px !important;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+    touch-action: manipulation;
+  }
+
+  .search-fallback-input:focus {
+    outline: none;
+    transform: none !important;
+    font-size: 16px !important;
+  }
+
+  .search-fallback-input::placeholder {
+    color: var(--text-muted);
+    opacity: 0.65;
   }
 
   .search-placeholder-icon {
@@ -901,22 +1030,46 @@ function formatDate(iso: string) {
 
   .card-links {
     display: flex;
+    align-items: center;
     gap: 14px;
     flex-shrink: 0;
     margin-left: auto;
   }
 
   .link-detail {
+    display: inline-flex;
+    align-items: center;
     color: var(--accent);
     font-weight: 500;
+    transition: color 0.2s ease, filter 0.2s ease, text-shadow 0.2s ease;
+  }
+
+  .link-detail:hover {
+    color: #ffffff;
+    filter: drop-shadow(0 0 8px rgba(255, 255, 255, 0.55)) drop-shadow(0 0 12px rgba(16, 185, 129, 0.45));
+    text-shadow: 0 0 8px rgba(255, 255, 255, 0.45);
   }
 
   .link-github {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
     color: var(--text-muted);
+  }
+
+  .link-github .gh-icon {
+    display: inline-block;
+    flex-shrink: 0;
+    opacity: 0.85;
+    transition: opacity 0.15s ease;
   }
 
   .link-github:hover {
     color: var(--text);
+  }
+
+  .link-github:hover .gh-icon {
+    opacity: 1;
   }
 
   .empty-state {
@@ -1010,6 +1163,14 @@ function formatDate(iso: string) {
       padding: 0 10px;
       gap: 6px;
       font-size: 0.82rem;
+    }
+
+    .search-fallback-input {
+      font-size: 16px !important;
+    }
+
+    .toolbar-selects select {
+      font-size: 16px !important;
     }
 
     .search-placeholder-icon {

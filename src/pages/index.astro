@@ -597,6 +597,7 @@ function formatDate(iso: string) {
     border: none;
     background: var(--surface);
     color: var(--text-muted);
+    font-family: 'LXGW WenKai TC', 'LXGW WenKai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 0.85rem;
     cursor: pointer;
     transition: all 0.15s ease;
@@ -623,6 +624,7 @@ function formatDate(iso: string) {
   }
 
   .pill-count {
+    font-family: 'LXGW WenKai TC', 'LXGW WenKai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 0.75rem;
     opacity: 0.8;
   }
@@ -643,9 +645,14 @@ function formatDate(iso: string) {
     border: none;
     border-radius: 8px;
     padding: 6px 10px;
+    font-family: 'LXGW WenKai TC', 'LXGW WenKai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
     font-size: 0.84rem;
     cursor: pointer;
     transition: background 0.15s ease, color 0.15s ease;
+  }
+
+  .toolbar-selects option {
+    font-family: 'LXGW WenKai TC', 'LXGW WenKai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
   }
 
   .toolbar-selects select:hover {
@@ -656,7 +663,7 @@ function formatDate(iso: string) {
   /* 卡片列表：无边框设计 */
   .cards-grid {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 16px;
   }
 
@@ -670,6 +677,10 @@ function formatDate(iso: string) {
     display: flex;
     flex-direction: column;
     gap: 10px;
+    min-width: 0;
+    overflow: hidden;
+    word-break: break-word;
+    overflow-wrap: anywhere;
     box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2);
     transition: transform 0.2s ease, background 0.15s ease, box-shadow 0.2s ease;
   }
@@ -684,7 +695,8 @@ function formatDate(iso: string) {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    gap: 8px;
+    gap: 6px 8px;
+    flex-wrap: wrap;
   }
 
   .risk-badge {
@@ -693,6 +705,7 @@ function formatDate(iso: string) {
     padding: 2px 9px;
     border-radius: 8px;
     border: none;
+    flex-shrink: 0;
   }
 
   .badge-high {
@@ -718,12 +731,15 @@ function formatDate(iso: string) {
   .issue-meta {
     font-size: 0.78rem;
     color: var(--text-muted);
+    flex-shrink: 0;
   }
 
   .card-title {
     margin: 0;
     font-size: 1.04rem;
     line-height: 1.4;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .card-title a:hover {
@@ -752,6 +768,8 @@ function formatDate(iso: string) {
     -webkit-line-clamp: 3;
     -webkit-box-orient: vertical;
     overflow: hidden;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .latest-comment {
@@ -764,6 +782,9 @@ function formatDate(iso: string) {
     gap: 8px;
     align-items: flex-start;
     font-size: 0.82rem;
+    min-width: 0;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .comment-icon {
@@ -773,12 +794,15 @@ function formatDate(iso: string) {
 
   .comment-content {
     flex: 1;
+    min-width: 0;
     overflow: hidden;
     text-overflow: ellipsis;
     display: -webkit-box;
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     line-height: 1.45;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .comment-author {
@@ -788,6 +812,8 @@ function formatDate(iso: string) {
 
   .comment-text {
     color: #cbd5e1;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .card-footer {
@@ -797,6 +823,8 @@ function formatDate(iso: string) {
     display: flex;
     align-items: center;
     justify-content: space-between;
+    gap: 8px;
+    flex-wrap: wrap;
     font-size: 0.82rem;
   }
 
@@ -804,11 +832,14 @@ function formatDate(iso: string) {
     display: flex;
     gap: 12px;
     color: var(--text-muted);
+    flex-shrink: 0;
   }
 
   .card-links {
     display: flex;
     gap: 14px;
+    flex-shrink: 0;
+    margin-left: auto;
   }
 
   .link-detail {
@@ -841,10 +872,141 @@ function formatDate(iso: string) {
 
   @media (max-width: 900px) {
     .kpi-grid {
-      grid-template-columns: repeat(2, 1fr);
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
     .cards-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  @media (max-width: 640px) {
+    .kpi-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 10px;
+      margin-bottom: 16px;
+    }
+
+    .kpi-card {
+      padding: 12px 12px;
+      gap: 2px;
+      border-radius: 10px;
+      min-width: 0;
+    }
+
+    .kpi-label {
+      font-size: 0.74rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .kpi-value {
+      font-size: 1.45rem;
+    }
+
+    .kpi-time {
+      font-size: 1.05rem;
+      padding-top: 2px;
+      white-space: nowrap;
+    }
+
+    .kpi-sub {
+      font-size: 0.7rem;
+      line-height: 1.35;
+      word-break: break-word;
+    }
+
+    .search-section {
+      padding: 10px 12px;
+      margin-bottom: 16px;
+      border-radius: 12px;
+    }
+
+    .search-bar-row {
+      gap: 10px;
+      align-items: center;
+    }
+
+    .search-title-stack {
+      width: 2.7rem;
+      height: 38px;
+      padding: 0;
+    }
+
+    .title-top {
+      font-size: 1.3rem;
+    }
+
+    .title-bottom {
+      font-size: 0.88rem;
+    }
+
+    .search-placeholder-bar {
+      height: 38px;
+      padding: 0 10px;
+      gap: 6px;
+      font-size: 0.82rem;
+    }
+
+    .search-placeholder-icon {
+      width: 15px;
+      height: 15px;
+    }
+
+    .toolbar {
+      gap: 8px;
+      margin-bottom: 14px;
+    }
+
+    .filter-pills {
+      gap: 6px;
+    }
+
+    .pill {
+      padding: 5px 9px;
+      font-size: 0.78rem;
+      gap: 4px;
+    }
+
+    .toolbar-selects {
+      width: 100%;
+      gap: 8px;
+    }
+
+    .toolbar-selects select {
+      flex: 1;
+      min-width: 0;
+      padding: 6px 8px;
+      font-size: 0.8rem;
+    }
+
+    .cards-grid {
+      gap: 12px;
+    }
+
+    .issue-card {
+      padding: 14px 14px;
+      border-radius: 10px;
+      gap: 8px;
+    }
+
+    .card-title {
+      font-size: 0.98rem;
+    }
+
+    .card-summary {
+      font-size: 0.84rem;
+      -webkit-line-clamp: 3;
+    }
+
+    .latest-comment {
+      padding: 7px 10px;
+      font-size: 0.78rem;
+      gap: 6px;
+    }
+
+    .card-footer {
+      font-size: 0.76rem;
     }
   }
 </style>

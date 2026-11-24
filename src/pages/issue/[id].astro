@@ -104,6 +104,8 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     border: none;
     border-radius: 14px;
     padding: 26px;
+    min-width: 0;
+    overflow: hidden;
     box-shadow: 0 4px 24px rgba(0, 0, 0, 0.35);
   }
 
@@ -127,6 +129,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     font-size: 0.76rem;
     font-weight: 600;
     border: none;
+    flex-shrink: 0;
   }
 
   .badge-high {
@@ -153,6 +156,8 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     margin: 0 0 14px;
     font-size: 1.45rem;
     line-height: 1.35;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .tags-wrap {
@@ -188,6 +193,9 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     border: none;
     border-radius: 10px;
     padding: 16px;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   }
 
@@ -197,6 +205,8 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     color: #e2e8f0;
     line-height: 1.7;
     font-size: 0.92rem;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .comment-list {
@@ -213,6 +223,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     border: none;
     border-radius: 10px;
     padding: 14px;
+    min-width: 0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
   }
 
@@ -222,10 +233,13 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     font-size: 0.82rem;
     color: var(--text-muted);
     margin-bottom: 8px;
+    gap: 8px;
+    flex-wrap: wrap;
   }
 
   .comment-author {
     color: var(--accent);
+    word-break: break-word;
   }
 
   .comment-body {
@@ -234,6 +248,8 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     color: #cbd5e1;
     line-height: 1.55;
     white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
   }
 
   .empty-comment-hint {
@@ -244,6 +260,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     border: none;
     border-radius: 8px;
     padding: 12px 14px;
+    word-break: break-word;
   }
 
   .cta-bar {
@@ -255,11 +272,66 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
   .cta-bar .btn {
     border: none;
     background: rgba(17, 24, 39, 0.7);
+    font-family: inherit;
   }
 
   .cta-bar .btn:hover {
     color: #ffffff;
     background: var(--surface-hover);
     box-shadow: 0 4px 14px rgba(255, 255, 255, 0.1);
+  }
+
+  @media (max-width: 640px) {
+    .detail-card {
+      padding: 16px 14px;
+      border-radius: 12px;
+    }
+    .detail-meta {
+      gap: 6px 10px;
+      font-size: 0.76rem;
+    }
+    .detail-title {
+      font-size: 1.22rem;
+      margin-bottom: 12px;
+    }
+    .tags-wrap {
+      gap: 6px;
+      margin-bottom: 16px;
+    }
+    .detail-section {
+      margin-top: 16px;
+      padding-top: 14px;
+    }
+    .detail-section h2 {
+      font-size: 0.96rem;
+      margin-bottom: 10px;
+    }
+    .body-content {
+      padding: 12px;
+    }
+    .body-text {
+      font-size: 0.86rem;
+      line-height: 1.6;
+    }
+    .comment-item {
+      padding: 10px 12px;
+      gap: 6px;
+    }
+    .comment-body {
+      font-size: 0.82rem;
+    }
+    .cta-bar {
+      margin-top: 20px;
+      padding-top: 16px;
+    }
+    .cta-bar .btn {
+      width: 100%;
+      padding: 10px 12px;
+      font-size: 0.82rem;
+      justify-content: center;
+      text-align: center;
+      white-space: normal;
+      line-height: 1.4;
+    }
   }
 </style>

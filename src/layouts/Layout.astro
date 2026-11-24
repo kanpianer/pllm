@@ -112,7 +112,7 @@ const {
         </div>
         <div class="modal-body">
           <p class="modal-lead">
-            上榜的机场不代表真的就跑路了，但可以看到某机场在不同用户使用中的表现，具体需要根据用户反馈自行判断，一般反馈的越多，信息越准确。
+            上榜的机场不代表真的就跑路了，但可以看到某机场在不同用户使用中的表现，具体需要根据用户反馈自行判断，一般反馈的越多，信息越准确。内容仅作公开信息聚合展示与风险提示，不构成任何定性结论或消费建议。
           </p>
           <p class="modal-meta-line">
             本站数据来自：<a href="https://github.com/limbopro/Paolujichang" target="_blank" rel="noopener noreferrer" class="modal-gh-link"><svg class="inline-gh-svg" width="15" height="15" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><path fill-rule="evenodd" clip-rule="evenodd" d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"/></svg><span>Paolujichang</span></a>，你可以到 <a href="https://github.com/limbopro/Paolujichang/issues/new/choose" target="_blank" rel="noopener noreferrer" class="modal-action-link">这里</a> 提交跑路线索。
@@ -241,6 +241,13 @@ const {
         }
       });
 
+      // 注册 Service Worker 实现主页临时缓存与秒开，从详情页返回时无需重新拉取远端
+      if ('serviceWorker' in navigator && (window.location.protocol === 'https:' || window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')) {
+        window.addEventListener('load', () => {
+          navigator.serviceWorker.register('/sw.js').catch(() => {});
+        });
+      }
+
       // 首次访问将静态资源（字体样式、Logo、背景图片）保存至 localStorage，提升下次秒开速度
       window.addEventListener('load', () => {
         const idle = window.requestIdleCallback || ((cb) => setTimeout(cb, 1000));
@@ -339,11 +346,11 @@ const {
     --pagefind-ui-scale: 0.92;
     --pagefind-ui-primary: #38bdf8;
     --pagefind-ui-text: #f1f5f9;
-    --pagefind-ui-background: #111827;
+    --pagefind-ui-background: rgba(17, 24, 39, 0.72);
     --pagefind-ui-border: transparent;
     --pagefind-ui-tag: #1e293b;
     --pagefind-ui-border-width: 0px;
-    --pagefind-ui-border-radius: 10px;
+    --pagefind-ui-border-radius: 12px;
     --pagefind-ui-font: 'LXGW WenKai TC', 'LXGW WenKai', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   }
 
@@ -424,7 +431,7 @@ const {
 
   .brand-title {
     font-weight: 800;
-    font-size: 1.38rem;
+    font-size: 1.45rem;
     letter-spacing: -0.02em;
     color: #fff;
     line-height: 1.1;
@@ -568,17 +575,20 @@ const {
     flex-shrink: 0;
   }
 
-  /* Pagefind 全局深度定制：彻底移除外边框线 */
+  /* Pagefind 全局深度定制：背景与阴影和信息卡片保持一致，只保留框阴影 */
   .pagefind-ui__search-input {
     color: #ffffff !important;
     font-size: 0.92rem !important;
     height: 44px !important;
     padding: 0 54px 0 42px !important;
-    background-color: var(--pagefind-ui-background) !important;
+    background: var(--surface) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
     border: none !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     font-weight: 500 !important;
-    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25) !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    transition: background 0.15s ease, box-shadow 0.2s ease !important;
   }
 
   .pagefind-ui__search-input::placeholder {
@@ -589,7 +599,8 @@ const {
 
   .pagefind-ui__search-input:focus {
     outline: none !important;
-    box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.2) !important;
+    border: none !important;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35) !important;
   }
 
   /* 搜索图标定位垂直居中 */
@@ -631,16 +642,34 @@ const {
     box-shadow: 0 2px 8px rgba(239, 68, 68, 0.2) !important;
   }
 
-  /* 搜索结果过滤内容框：无外框 */
+  /* 搜索结果抽屉与过滤内容框：向左靠齐“买前搜一下”左侧，背景与阴影与信息卡片一致，宽度适中 */
+  .pagefind-ui__drawer {
+    margin-left: calc(-3.12rem - 16px) !important;
+    width: calc(100% + 3.12rem + 16px) !important;
+    gap: 20px !important;
+    margin-top: 14px !important;
+  }
+
   .pagefind-ui__filter-panel {
     border: none !important;
-    border-radius: 10px !important;
+    border-radius: 12px !important;
     background: var(--surface) !important;
     backdrop-filter: blur(10px) !important;
     -webkit-backdrop-filter: blur(10px) !important;
-    padding: 6px 16px 10px !important;
-    margin-top: 14px !important;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3) !important;
+    padding: 8px 12px 12px !important;
+    margin-top: 0 !important;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.2) !important;
+    flex: 0 0 182px !important;
+    width: 182px !important;
+    max-width: 182px !important;
+    min-width: 182px !important;
+    box-sizing: border-box !important;
+  }
+
+  .pagefind-ui__results-area {
+    margin-top: 0 !important;
+    flex: 1 !important;
+    min-width: 0 !important;
   }
 
   .pagefind-ui__filter-panel-label {
@@ -649,25 +678,42 @@ const {
 
   .pagefind-ui__filter-block {
     border-bottom: none !important;
-    padding: 12px 0 !important;
+    padding: 8px 0 !important;
   }
 
   .pagefind-ui__filter-block:last-of-type {
     border-bottom: none !important;
   }
 
+  .pagefind-ui__filter-group {
+    padding-top: 8px !important;
+    gap: 8px !important;
+  }
+
   .pagefind-ui__filter-name {
     color: var(--text) !important;
-    font-size: 0.88rem !important;
+    font-size: 0.86rem !important;
     font-weight: 600 !important;
   }
 
   .pagefind-ui__filter-value {
     color: var(--text-muted) !important;
-    font-size: 0.84rem !important;
+    font-size: 0.8rem !important;
+    white-space: nowrap !important;
   }
 
-  /* 首次访问提示弹窗样式 */
+  .pagefind-ui__filter-checkbox {
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+    background-color: rgba(30, 41, 59, 0.7) !important;
+    border-radius: 4px !important;
+  }
+
+  .pagefind-ui__filter-checkbox:checked {
+    background-color: var(--accent) !important;
+    border-color: var(--accent) !important;
+  }
+
+  /* 首次访问提示弹窗样式：UI与机场信息卡片保持一致 */
   .modal-backdrop {
     position: fixed;
     inset: 0;
@@ -678,6 +724,7 @@ const {
     padding: 20px;
     background: rgba(3, 7, 18, 0.72);
     backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
     opacity: 0;
     visibility: hidden;
     transition: opacity 0.25s ease, visibility 0.25s ease;
@@ -691,12 +738,14 @@ const {
   .modal-card {
     position: relative;
     width: 100%;
-    max-width: 520px;
-    background: var(--surface-solid);
+    max-width: 500px;
+    background: var(--surface);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
     border: none;
-    border-radius: 16px;
-    padding: 24px;
-    box-shadow: 0 16px 44px rgba(0, 0, 0, 0.6);
+    border-radius: 12px;
+    padding: 20px 22px;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45);
     transform: scale(0.95) translateY(8px);
     transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
   }
@@ -709,21 +758,22 @@ const {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 16px;
+    margin-bottom: 14px;
   }
 
+  /* 访问提示标识：添加橙色背景，与卡片预警/观察中标识风格保持一致 */
   .modal-badge {
     display: inline-flex;
     align-items: center;
-    gap: 6px;
-    padding: 8px 14px;
+    gap: 5px;
+    padding: 3px 10px;
     border-radius: 8px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    line-height: 1;
-    color: var(--text-muted);
+    font-size: 0.76rem;
+    font-weight: 600;
+    line-height: 1.2;
+    background: rgba(245, 158, 11, 0.18);
+    color: #fbbf24;
     border: none;
-    background: rgba(17, 24, 39, 0.6);
     user-select: none;
   }
 
@@ -731,8 +781,8 @@ const {
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    width: 32px;
-    height: 32px;
+    width: 28px;
+    height: 28px;
     border: none;
     border-radius: 8px;
     background: rgba(17, 24, 39, 0.6);
@@ -750,21 +800,23 @@ const {
     display: flex;
     flex-direction: column;
     gap: 12px;
-    margin-bottom: 22px;
+    margin-bottom: 18px;
   }
 
   .modal-lead {
     margin: 0;
-    font-size: 0.94rem;
-    line-height: 1.65;
-    color: #e2e8f0;
-  }
-
-  .modal-meta-line {
-    margin: 0;
     font-size: 0.88rem;
     line-height: 1.65;
+    color: #cbd5e1;
+  }
+
+  /* 来源与提交线索提示居中显示 */
+  .modal-meta-line {
+    margin: 0;
+    font-size: 0.84rem;
+    line-height: 1.65;
     color: var(--text-muted);
+    text-align: center;
   }
 
   .modal-gh-link {
@@ -808,10 +860,12 @@ const {
   }
 
   .modal-btn-confirm {
-    padding: 8px 16px;
+    padding: 6px 14px;
     border-radius: 8px;
     border: none;
+    font-size: 0.82rem;
     color: var(--text);
+    background: rgba(17, 24, 39, 0.6);
   }
 
   .modal-btn-confirm:hover {
@@ -848,7 +902,6 @@ const {
     }
     .header-inner {
       height: 54px;
-      padding: 0;
       flex-direction: row;
       align-items: center;
       justify-content: space-between;
@@ -868,7 +921,7 @@ const {
       min-width: 0;
     }
     .brand-title {
-      font-size: 1.05rem;
+      font-size: 1.18rem;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
@@ -887,8 +940,8 @@ const {
       padding: 14px;
     }
     .modal-card {
-      padding: 18px 16px;
-      border-radius: 14px;
+      padding: 16px 14px;
+      border-radius: 10px;
     }
     .back-to-top {
       right: 14px;
@@ -901,6 +954,40 @@ const {
       bottom: 16px;
       width: 40px;
       height: 40px;
+    }
+    /* 移动端搜索：过滤框与搜索结果内容宽度增加至和“买前搜一下”左侧对齐 */
+    .pagefind-ui__search-input {
+      height: 38px !important;
+      font-size: 0.84rem !important;
+      padding: 0 44px 0 36px !important;
+    }
+    .pagefind-ui__form:before {
+      top: 11px !important;
+      left: 12px !important;
+      width: 15px !important;
+      height: 15px !important;
+    }
+    .pagefind-ui__drawer {
+      margin-left: calc(-2.7rem - 10px) !important;
+      width: calc(100% + 2.7rem + 10px) !important;
+      gap: 12px !important;
+      margin-top: 12px !important;
+      flex-direction: column !important;
+    }
+    .pagefind-ui__filter-panel {
+      flex: 1 1 auto !important;
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0 !important;
+      margin-top: 0 !important;
+      border-radius: 10px !important;
+      box-sizing: border-box !important;
+    }
+    .pagefind-ui__results-area {
+      width: 100% !important;
+      min-width: 0 !important;
+      margin-top: 0 !important;
+      box-sizing: border-box !important;
     }
   }
 </style>

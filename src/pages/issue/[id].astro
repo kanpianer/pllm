@@ -94,6 +94,49 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       </a>
     </div>
   </article>
+
+  <script is:inline>
+    // 从详情页返回主页优化：优先使用 history.back() 触发浏览器内存级 bfcache 秒开，不重新拉取远端内容
+    function setupDetailBack() {
+      const isFromSameSite = () => {
+        try {
+          return (
+            window.history.length > 1 &&
+            document.referrer &&
+            new URL(document.referrer).origin === window.location.origin
+          );
+        } catch (e) {
+          return false;
+        }
+      };
+
+      const backBtn = document.querySelector('.floating-back-btn');
+      if (backBtn) {
+        backBtn.addEventListener('click', (e) => {
+          if (isFromSameSite()) {
+            e.preventDefault();
+            window.history.back();
+          }
+        });
+      }
+
+      const brandLogoLink = document.querySelector('.site-header .brand');
+      if (brandLogoLink) {
+        brandLogoLink.addEventListener('click', (e) => {
+          if (isFromSameSite()) {
+            e.preventDefault();
+            window.history.back();
+          }
+        });
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', setupDetailBack);
+    } else {
+      setupDetailBack();
+    }
+  </script>
 </Layout>
 
 <style>

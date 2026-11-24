@@ -136,10 +136,10 @@ function detectRiskLevel(issue) {
 
   // 1. 已关闭 Issue 处理
   if (state === 'CLOSED') {
-    if (labels.some((l) => l.includes('误报') || l.includes('已恢复') || l.includes('正常'))) {
+    if (labels.some((l) => l.includes('误报') || l.includes('已恢复') || l.includes('正常') || l.includes('解决'))) {
       return 'resolved';
     }
-    if (title.includes('误报') || title.includes('恢复') || title.includes('解除')) {
+    if (title.includes('误报') || title.includes('恢复') || title.includes('解除') || title.includes('解决')) {
       return 'resolved';
     }
     return 'archive';
@@ -276,10 +276,21 @@ async function sync() {
     const riskLevel = detectRiskLevel(issue);
     const cleanedBody = cleanIssueBody(issue.body || '');
     const summary = cleanSummary(cleanedBody);
-    const labels = (issue.labels || []).map((l) => ({
-      name: typeof l === 'string' ? l : l.name || '',
-      color: typeof l === 'string' ? '666666' : l.color || '666666',
-    }));
+    const labels = (issue.labels || []).map((l) => {
+      let name = typeof l === 'string' ? l : l.name || '';
+      if (name.includes('过久无人回应')) {
+        name = '过久无人回应 💤';
+      } else if (name.includes('问题已解决')) {
+        name = '已解决 👌';
+      } else if (name.includes('需要更多反馈')) {
+        name = '需更多反馈 🤔';
+      }
+
+      return {
+        name,
+        color: typeof l === 'string' ? '666666' : l.color || '666666',
+      };
+    });
 
     const comments = commentsMap.get(issue.number) || [];
 

@@ -1486,7 +1486,7 @@
     "riskLevel": "high",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       },
       {
@@ -2365,7 +2365,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "issue过久无人回应关闭",
+        "name": "过久无人回应 💤",
         "color": "46f25f"
       }
     ],
@@ -2385,7 +2385,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "issue过久无人回应关闭",
+        "name": "过久无人回应 💤",
         "color": "46f25f"
       }
     ],
@@ -2405,7 +2405,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "issue过久无人回应关闭",
+        "name": "过久无人回应 💤",
         "color": "46f25f"
       }
     ],
@@ -2582,7 +2582,7 @@
     "riskLevel": "high",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -2637,7 +2637,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "issue过久无人回应关闭",
+        "name": "过久无人回应 💤",
         "color": "46f25f"
       }
     ],
@@ -2687,7 +2687,7 @@
     "riskLevel": "resolved",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -2722,7 +2722,7 @@
     "riskLevel": "resolved",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -3868,7 +3868,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "需要更多反馈 🤔",
+        "name": "需更多反馈 🤔",
         "color": "a78bfa"
       }
     ],
@@ -5042,7 +5042,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -5598,7 +5598,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6325,7 +6325,7 @@
     "riskLevel": "resolved",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6360,7 +6360,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6490,7 +6490,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6651,7 +6651,7 @@
     "riskLevel": "resolved",
     "labels": [
       {
-        "name": "需要更多反馈 🤔",
+        "name": "需更多反馈 🤔",
         "color": "a78bfa"
       }
     ],
@@ -6731,7 +6731,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6786,7 +6786,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -6806,7 +6806,7 @@
     "riskLevel": "high",
     "labels": [
       {
-        "name": "需要更多反馈 🤔",
+        "name": "需更多反馈 🤔",
         "color": "a78bfa"
       }
     ],
@@ -6861,7 +6861,7 @@
     "riskLevel": "high",
     "labels": [
       {
-        "name": "需要更多反馈 🤔",
+        "name": "需更多反馈 🤔",
         "color": "a78bfa"
       }
     ],
@@ -6992,7 +6992,7 @@
     "riskLevel": "high",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],
@@ -7087,7 +7087,7 @@
     "riskLevel": "warning",
     "labels": [
       {
-        "name": "需要更多反馈 🤔",
+        "name": "需更多反馈 🤔",
         "color": "a78bfa"
       }
     ],
@@ -7538,7 +7538,7 @@
     "riskLevel": "archive",
     "labels": [
       {
-        "name": "问题已解决 👌",
+        "name": "已解决 👌",
         "color": "16a34a"
       }
     ],

@@ -41,7 +41,30 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
 
     <!-- 仅显示用户实际提交的有效内容，已剔除静态说明与指引模板 -->
     <section class="detail-section">
-      <h2>线索提交内容</h2>
+      <div class="section-title-bar">
+        <h2>线索提交内容</h2>
+        <div class="jiakuan-promo" data-pagefind-ignore>
+          <span>到</span>
+          <a
+            href="https://jiakuan.link/"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="jiakuan-btn"
+            title="前往家宽导航"
+          >
+            <img
+              src="/icons/jiakuan.png"
+              alt="家宽导航"
+              class="jiakuan-favicon"
+              width="15"
+              height="15"
+              loading="lazy"
+            />
+            <span>家宽导航</span>
+          </a>
+          <span>买还没跑路的机场</span>
+        </div>
+      </div>
       <div class="body-content">
         <p class="body-text">{item.body || item.summary || '原贴未提供文字摘要，请前往 GitHub 查看原贴讨论。'}</p>
       </div>
@@ -52,7 +75,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       <section class="detail-section">
         <h2>用户最新讨论与社区跟进（共 {item.commentCount} 条讨论）</h2>
         <ul class="comment-list">
-          {item.latestComments.slice(0, 15).map((c) => (
+          {item.latestComments.slice(0, 25).map((c) => (
             <li class="comment-item">
               <div class="comment-head">
                 <strong class="comment-author">@{c.author}</strong>
@@ -180,6 +203,68 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     color: var(--text);
   }
 
+  .section-title-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px 16px;
+    margin-bottom: 12px;
+  }
+
+  .section-title-bar h2 {
+    margin: 0;
+    font-size: 1.05rem;
+    color: var(--text);
+  }
+
+  .jiakuan-promo {
+    margin-left: auto;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.85rem;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .jiakuan-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    padding: 3px 10px;
+    border-radius: 6px;
+    font-size: 0.82rem;
+    font-weight: 600;
+    color: #6ee7b7;
+    background: rgba(16, 185, 129, 0.16);
+    border: none;
+    outline: none;
+    text-decoration: none;
+    transition: all 0.16s ease;
+    cursor: pointer;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  .jiakuan-btn:hover {
+    color: #ffffff;
+    background: rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .jiakuan-btn:active {
+    transform: translateY(0);
+  }
+
+  .jiakuan-favicon {
+    width: 15px;
+    height: 15px;
+    object-fit: contain;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+
   .body-content {
     background: rgba(15, 23, 42, 0.5);
     border: none;
@@ -297,6 +382,28 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     .detail-section h2 {
       font-size: 0.96rem;
       margin-bottom: 10px;
+    }
+    .section-title-bar {
+      margin-bottom: 10px;
+      gap: 6px 12px;
+    }
+    .section-title-bar h2 {
+      font-size: 0.96rem;
+      margin-bottom: 0;
+    }
+    .jiakuan-promo {
+      font-size: 0.78rem;
+      gap: 4px;
+    }
+    .jiakuan-btn {
+      padding: 2px 7px;
+      font-size: 0.75rem;
+      gap: 4px;
+      border-radius: 5px;
+    }
+    .jiakuan-favicon {
+      width: 13px;
+      height: 13px;
     }
     .body-content {
       padding: 12px;

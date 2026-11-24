@@ -200,8 +200,8 @@ async function fetchRepoComments(maxPages = 15) {
         }
 
         const list = commentsByIssue.get(issueId);
-        // 每个 issue 最多保留 15 条最新评论
-        if (list.length < 15) {
+        // 每个 issue 最多保留 25 条最新评论
+        if (list.length < 25) {
           list.push({
             author: c.user?.login || '匿名用户',
             text: c.body
@@ -312,7 +312,7 @@ async function sync() {
       }
     }
     mergedComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    const comments = mergedComments.slice(0, 15);
+    const comments = mergedComments.slice(0, 25);
 
     return {
       id: issue.number,

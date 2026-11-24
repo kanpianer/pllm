@@ -3,10 +3,10 @@
   "type": "module",
   "version": "1.0.0",
   "scripts": {
-    "dev": "astro dev",
+    "dev": "astro dev --host --port 4321",
     "sync": "node scripts/sync.mjs",
     "build": "astro build && pagefind --site dist && cp -r dist/pagefind public/",
-    "preview": "astro preview"
+    "preview": "astro preview --host --port 4321"
   },
   "dependencies": {
     "astro": "^5.0.0"

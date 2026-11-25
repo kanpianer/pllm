@@ -7,6 +7,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { cleanIssueBody } from '../src/utils/issueCleaner.mjs';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -35,56 +36,6 @@ async function fetchJSON(url) {
     throw new Error(`GitHub API HTTP ${res.status}: ${res.statusText}`);
   }
   return res.json();
-}
-
-/**
- * 净化 Issue 正文：剔除末尾静态模板指引、须知说明以及未填写的空占位字段，只保留用户实际提交内容
- */
-function cleanIssueBody(body = '') {
-  if (!body) return '';
-
-  let text = body;
-
-  // 1. 切除说明指引与小贴士（从以下分隔标记处截断）
-  const cutPatterns = [
-    /\n---\s*\n\s*⚠️\s*以下.*?/i,
-    /\n###?\s*⚠️?\s*提交\s*Issue\s*前请先确认[\s\S]*/i,
-    /\n##\s*投稿与交流小贴士[\s\S]*/i,
-    /\n###?\s*issue\s*\/?\s*留言模板参考[\s\S]*/i,
-    /\n##\s*提交\s*issue\s*.*须知[\s\S]*/i,
-    /\n##\s*细节补充[\s\S]*/i,
-    /\n##\s*最后[\s\S]*/i,
-    /\n\*\s*P\.S\.\s*千人千面[\s\S]*/i,
-  ];
-
-  for (const pat of cutPatterns) {
-    const idx = text.search(pat);
-    if (idx !== -1) {
-      text = text.substring(0, idx);
-    }
-  }
-
-  // 2. 清理顶部的模板提示语
-  text = text
-    .replace(/^请按.*?如实填写.*?(\n|$)/i, '')
-    .replace(/^##\s*issue\s*详情说明.*?(\n|$)/i, '')
-    .replace(/<!--[\s\S]*?-->/g, '');
-
-  // 3. 移除未填写的纯空模板行（例如只有提示词，没有实际值的行）
-  text = text
-    .split('\n')
-    .filter((line) => {
-      const trimmed = line.trim();
-      // 匹配只有字段名和括号提示，没有用户输入内容的行
-      if (/^[🏷️🔗🔄⏳💰📖📊🕐⏱️📅📞💬📝📡💻📌\s]*\*\*[^*]+\*\*[：:]?\s*(（.*?）|\(.*?\))?\s*$/.test(trimmed)) {
-        return false;
-      }
-      return true;
-    })
-    .join('\n')
-    .trim();
-
-  return text || '原贴未提供详细文字描述，请前往 GitHub 查看原贴讨论。';
 }
 
 function cleanSummary(cleanedBody = '') {
@@ -134,18 +85,28 @@ function detectRiskLevel(issue) {
   const labels = (issue.labels || []).map((l) => (typeof l === 'string' ? l : l.name || ''));
   const title = issue.title || '';
 
-  // 1. 已关闭 Issue 处理
+  // 1. 明确标记已解决 / 误报 / 已恢复（无论是否已关闭或标题含跑路字样，均归类到已恢复）
+  if (labels.some((l) => l.includes('已解决') || l.includes('问题已解决') || l.includes('误报') || l.includes('已恢复'))) {
+    return 'resolved';
+  }
+
+  // 2. 已关闭（归档）Issue 处理
   if (state === 'CLOSED') {
-    if (labels.some((l) => l.includes('误报') || l.includes('已恢复') || l.includes('正常') || l.includes('解决'))) {
+    if (labels.some((l) => l.includes('正常'))) {
       return 'resolved';
     }
-    if (title.includes('误报') || title.includes('恢复') || title.includes('解除') || title.includes('解决')) {
+    if (
+      title.includes('误报') ||
+      title.includes('恢复') ||
+      title.includes('解除') ||
+      /(?<!不|未|没)解决/.test(title)
+    ) {
       return 'resolved';
     }
     return 'archive';
   }
 
-  // 2. 明确标记或标题为跑路
+  // 3. 明确标记或标题为跑路
   if (
     labels.some((l) => l.includes('已跑路') || l.includes('跑路') || l.includes('runaway')) ||
     title.includes('已跑路') ||
@@ -156,7 +117,7 @@ function detectRiskLevel(issue) {
     return 'high';
   }
 
-  // 3. 预警 / 异常 / 观察中
+  // 4. 预警 / 异常 / 观察中
   if (
     labels.some((l) => l.includes('预警') || l.includes('观察中') || l.includes('风险')) ||
     title.includes('预警') ||
@@ -167,11 +128,6 @@ function detectRiskLevel(issue) {
     title.includes('风控')
   ) {
     return 'warning';
-  }
-
-  // 4. 误报或恢复
-  if (labels.some((l) => l.includes('误报') || l.includes('已恢复'))) {
-    return 'resolved';
   }
 
   return 'warning';
@@ -200,15 +156,13 @@ async function fetchRepoComments(maxPages = 15) {
         }
 
         const list = commentsByIssue.get(issueId);
-        // 每个 issue 最多保留 25 条最新评论
-        if (list.length < 25) {
+        // 每个 issue 最多保留 100 条最新评论
+        if (list.length < 100) {
           list.push({
             author: c.user?.login || '匿名用户',
             text: c.body
-              .replace(/!\[.*?\]\(.*?\)/g, '')
-              .replace(/<img[^>]*>/gi, '')
               .replace(/\r\n/g, '\n')
-              .slice(0, 260)
+              .slice(0, 1200)
               .trim(),
             createdAt: c.created_at || '',
           });
@@ -312,7 +266,7 @@ async function sync() {
       }
     }
     mergedComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());
-    const comments = mergedComments.slice(0, 25);
+    const comments = mergedComments.slice(0, 100);
 
     return {
       id: issue.number,

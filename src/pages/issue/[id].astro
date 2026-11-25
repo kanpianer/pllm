@@ -1,6 +1,10 @@
 ---
 import Layout from '../../layouts/Layout.astro';
+import CommentThreadNode from '../../components/CommentThreadNode.astro';
 import issues from '../../data/issues.json';
+import { renderMarkdown } from '../../utils/markdown';
+import { buildCommentTree } from '../../utils/comments';
+import { cleanIssueBody } from '../../utils/issueCleaner.mjs';
 
 export function getStaticPaths() {
   return issues.map((item) => ({
@@ -19,6 +23,10 @@ const riskMeta: Record<string, { label: string; className: string; icon: string 
 };
 
 const meta = riskMeta[item.riskLevel] || riskMeta.archive;
+const cleanedBody = cleanIssueBody(item.body || '', { fallback: '' });
+const bodySource = cleanedBody || item.summary || '原贴未提供文字摘要，请前往 GitHub 查看原贴讨论。';
+const renderedBody = await renderMarkdown(bodySource);
+const commentThreads = await buildCommentTree(item.latestComments || [], 100);
 ---
 
 <Layout title={`${item.title} | 你的机场，跑路了吗？`} description={item.summary} showBackBtn={true}>
@@ -66,22 +74,20 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
         </div>
       </div>
       <div class="body-content">
-        <p class="body-text">{item.body || item.summary || '原贴未提供文字摘要，请前往 GitHub 查看原贴讨论。'}</p>
+        <div class="body-text markdown-body" set:html={renderedBody} />
       </div>
     </section>
 
-    <!-- 用户评论列表展示 -->
-    {item.latestComments && item.latestComments.length > 0 ? (
+    <!-- 用户评论列表展示（支持最多 100 条及评论/引用树形串联） -->
+    {commentThreads.length > 0 ? (
       <section class="detail-section">
-        <h2>用户最新讨论与社区跟进（共 {item.commentCount} 条讨论）</h2>
+        <h2>
+          用户最新讨论与社区跟进（共 {item.commentCount} 条讨论{item.commentCount > 100 ? '，展示最新 100 条' : ''}）
+        </h2>
         <ul class="comment-list">
-          {item.latestComments.slice(0, 25).map((c) => (
+          {commentThreads.map((thread) => (
             <li class="comment-item">
-              <div class="comment-head">
-                <strong class="comment-author">@{c.author}</strong>
-                <span class="comment-time">{c.createdAt ? c.createdAt.slice(0, 10) : ''}</span>
-              </div>
-              <p class="comment-body">{c.text}</p>
+              <CommentThreadNode node={thread} depth={0} />
             </li>
           ))}
         </ul>
@@ -197,7 +203,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     border-top: none;
   }
 
-  .detail-section h2 {
+  .detail-section > h2 {
     margin: 0 0 12px;
     font-size: 1.05rem;
     color: var(--text);
@@ -278,7 +284,6 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
 
   .body-text {
     margin: 0;
-    white-space: pre-wrap;
     color: #e2e8f0;
     line-height: 1.7;
     font-size: 0.92rem;
@@ -302,31 +307,6 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     padding: 14px;
     min-width: 0;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
-  }
-
-  .comment-head {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.82rem;
-    color: var(--text-muted);
-    margin-bottom: 8px;
-    gap: 8px;
-    flex-wrap: wrap;
-  }
-
-  .comment-author {
-    color: var(--accent);
-    word-break: break-word;
-  }
-
-  .comment-body {
-    margin: 0;
-    font-size: 0.88rem;
-    color: #cbd5e1;
-    line-height: 1.55;
-    white-space: pre-wrap;
-    word-break: break-word;
-    overflow-wrap: anywhere;
   }
 
   .empty-comment-hint {
@@ -379,7 +359,7 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       margin-top: 16px;
       padding-top: 14px;
     }
-    .detail-section h2 {
+    .detail-section > h2 {
       font-size: 0.96rem;
       margin-bottom: 10px;
     }
@@ -414,10 +394,6 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
     }
     .comment-item {
       padding: 10px 12px;
-      gap: 6px;
-    }
-    .comment-body {
-      font-size: 0.82rem;
     }
     .cta-bar {
       margin-top: 20px;
@@ -432,5 +408,133 @@ const meta = riskMeta[item.riskLevel] || riskMeta.archive;
       white-space: normal;
       line-height: 1.4;
     }
+  }
+</style>
+
+<style is:global>
+  .markdown-body > *:first-child {
+    margin-top: 0;
+  }
+
+  .markdown-body > *:last-child {
+    margin-bottom: 0;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    margin: 1em 0 0.5em;
+    color: #f8fafc;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .markdown-body h1 {
+    font-size: 1.2rem;
+  }
+
+  .markdown-body h2 {
+    font-size: 1.06rem;
+  }
+
+  .markdown-body h3,
+  .markdown-body h4,
+  .markdown-body h5,
+  .markdown-body h6 {
+    font-size: 0.96rem;
+  }
+
+  .markdown-body p {
+    margin: 0 0 0.75em;
+  }
+
+  .markdown-body strong,
+  .markdown-body b {
+    color: #f8fafc;
+    font-weight: 600;
+  }
+
+  .markdown-body a {
+    color: var(--accent);
+    text-decoration: underline;
+    text-underline-offset: 2px;
+    word-break: break-all;
+  }
+
+  .markdown-body a:hover {
+    color: #a7f3d0;
+  }
+
+  .markdown-body blockquote {
+    margin: 0.75em 0;
+    padding: 8px 14px;
+    border-left: 3px solid var(--accent);
+    background: rgba(16, 185, 129, 0.08);
+    border-radius: 0 8px 8px 0;
+    color: #cbd5e1;
+  }
+
+  .markdown-body ul,
+  .markdown-body ol {
+    margin: 0.6em 0;
+    padding-left: 1.4em;
+  }
+
+  .markdown-body li {
+    margin: 0.25em 0;
+  }
+
+  .markdown-body code {
+    background: rgba(148, 163, 184, 0.16);
+    padding: 2px 6px;
+    border-radius: 5px;
+    font-size: 0.86em;
+    font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  }
+
+  .markdown-body pre {
+    background: rgba(2, 6, 23, 0.7);
+    padding: 12px 14px;
+    border-radius: 8px;
+    overflow-x: auto;
+    margin: 0.75em 0;
+  }
+
+  .markdown-body pre code {
+    background: none;
+    padding: 0;
+    font-size: 0.84em;
+  }
+
+  .markdown-body img {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+    margin: 10px 0;
+  }
+
+  .markdown-body hr {
+    border: none;
+    border-top: 1px solid rgba(148, 163, 184, 0.2);
+    margin: 14px 0;
+  }
+
+  .markdown-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 0.75em 0;
+    display: block;
+    overflow-x: auto;
+  }
+
+  .markdown-body th,
+  .markdown-body td {
+    border: 1px solid rgba(148, 163, 184, 0.22);
+    padding: 6px 10px;
+    text-align: left;
   }
 </style>

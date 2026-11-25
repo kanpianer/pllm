@@ -1,0 +1,302 @@
+---
+import type { CommentNode } from '../utils/comments';
+
+interface Props {
+  node: CommentNode;
+  depth?: number;
+}
+
+const { node, depth = 0 } = Astro.props;
+const hasChildren = node.children && node.children.length > 0;
+const clampIndent = depth >= 3;
+
+const AVATAR_TONES = [
+  { bg: 'rgba(16, 185, 129, 0.2)', text: '#6ee7b7', border: 'rgba(16, 185, 129, 0.38)' },
+  { bg: 'rgba(56, 189, 248, 0.18)', text: '#7dd3fc', border: 'rgba(56, 189, 248, 0.35)' },
+  { bg: 'rgba(167, 139, 250, 0.18)', text: '#c4b5fd', border: 'rgba(167, 139, 250, 0.35)' },
+  { bg: 'rgba(251, 191, 36, 0.16)', text: '#fcd34d', border: 'rgba(251, 191, 36, 0.32)' },
+  { bg: 'rgba(244, 114, 182, 0.16)', text: '#f9a8d4', border: 'rgba(244, 114, 182, 0.32)' },
+  { bg: 'rgba(45, 212, 191, 0.18)', text: '#5eead4', border: 'rgba(45, 212, 191, 0.35)' },
+];
+
+function getAvatarTone(name: string) {
+  let hash = 0;
+  for (let i = 0; i < name.length; i++) {
+    hash = (hash * 31 + name.charCodeAt(i)) >>> 0;
+  }
+  return AVATAR_TONES[hash % AVATAR_TONES.length];
+}
+
+function getInitial(name: string) {
+  const clean = (name || '').trim().replace(/^@/, '');
+  if (!clean) return '?';
+  return clean.slice(0, 1).toUpperCase();
+}
+
+const tone = getAvatarTone(node.author);
+const initial = getInitial(node.author);
+---
+
+<div class="thread-node">
+  <div class={`thread-node-row ${hasChildren && !clampIndent ? 'has-children' : ''}`}>
+    <div class="thread-avatar-col">
+      <span
+        class="comment-avatar"
+        style={`background: ${tone.bg}; color: ${tone.text}; border-color: ${tone.border};`}
+        aria-hidden="true"
+      >
+        {initial}
+      </span>
+    </div>
+
+    <div class="thread-content-col">
+      <div class="comment-head">
+        <div class="comment-author-group">
+          <strong class="comment-author">@{node.author}</strong>
+          {node.replyToAuthor && (
+            <span class="reply-badge" title={`回复 @${node.replyToAuthor}`}>
+              回复 @{node.replyToAuthor}
+            </span>
+          )}
+        </div>
+        <div class="comment-meta-right">
+          {node.replyCount > 0 && (
+            <span class="reply-count-pill">{node.replyCount} 条互动</span>
+          )}
+          <span class="comment-time">{node.createdAt ? node.createdAt.slice(0, 10) : ''}</span>
+        </div>
+      </div>
+
+      <div class="comment-body markdown-body" set:html={node.html} />
+    </div>
+  </div>
+
+  {hasChildren && (
+    <div class={`thread-children ${clampIndent ? 'depth-clamped' : ''}`}>
+      {node.children.map((child) => (
+        <div class={`thread-branch ${clampIndent ? 'branch-clamped' : ''}`}>
+          <Astro.self node={child} depth={depth + 1} />
+        </div>
+      ))}
+    </div>
+  )}
+</div>
+
+<style>
+  .thread-node {
+    --thread-line: #364459;
+    min-width: 0;
+  }
+
+  .thread-node-row {
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    position: relative;
+    min-width: 0;
+  }
+
+  .thread-avatar-col {
+    width: 28px;
+    flex-shrink: 0;
+    position: relative;
+    display: flex;
+    justify-content: center;
+  }
+
+  .comment-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 1px solid;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 0.76rem;
+    font-weight: 700;
+    line-height: 1;
+    user-select: none;
+    position: relative;
+    z-index: 1;
+  }
+
+  .thread-node-row.has-children > .thread-avatar-col::after {
+    content: '';
+    position: absolute;
+    left: 13px;
+    top: 32px;
+    bottom: 0;
+    width: 0;
+    border-left: 2px solid var(--thread-line);
+    pointer-events: none;
+  }
+
+  .thread-content-col {
+    flex: 1;
+    min-width: 0;
+    padding-bottom: 2px;
+  }
+
+  .comment-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.82rem;
+    color: var(--text-muted);
+    margin-bottom: 6px;
+    gap: 6px 10px;
+    flex-wrap: wrap;
+    min-height: 24px;
+  }
+
+  .comment-author-group {
+    display: inline-flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 6px;
+    min-width: 0;
+  }
+
+  .comment-author {
+    color: var(--accent);
+    word-break: break-word;
+  }
+
+  .reply-badge {
+    display: inline-flex;
+    align-items: center;
+    padding: 1px 7px;
+    border-radius: 999px;
+    font-size: 0.72rem;
+    font-weight: 500;
+    color: #93c5fd;
+    background: rgba(59, 130, 246, 0.14);
+    max-width: 100%;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .comment-meta-right {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    flex-shrink: 0;
+  }
+
+  .reply-count-pill {
+    font-size: 0.72rem;
+    color: var(--text-muted);
+    background: rgba(148, 163, 184, 0.12);
+    padding: 1px 6px;
+    border-radius: 999px;
+  }
+
+  .comment-body {
+    margin: 0;
+    font-size: 0.88rem;
+    color: #cbd5e1;
+    line-height: 1.6;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+  }
+
+  .comment-body :global(.comment-placeholder) {
+    color: var(--text-muted);
+    font-style: italic;
+    font-size: 0.82rem;
+  }
+
+  .thread-children {
+    margin-left: 13px;
+    min-width: 0;
+  }
+
+  .thread-children.depth-clamped {
+    margin-left: 0;
+  }
+
+  .thread-branch {
+    position: relative;
+    padding-left: 24px;
+    padding-top: 12px;
+    min-width: 0;
+  }
+
+  .thread-branch::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 18px;
+    height: 26px;
+    border-left: 2px solid var(--thread-line);
+    border-bottom: 2px solid var(--thread-line);
+    border-bottom-left-radius: 10px;
+    pointer-events: none;
+  }
+
+  .thread-branch:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    bottom: 0;
+    width: 0;
+    border-left: 2px solid var(--thread-line);
+    pointer-events: none;
+  }
+
+  .thread-branch.branch-clamped {
+    padding-left: 0;
+    padding-top: 10px;
+    margin-top: 8px;
+    border-top: 1px dashed rgba(148, 163, 184, 0.16);
+  }
+
+  .thread-branch.branch-clamped::before,
+  .thread-branch.branch-clamped::after {
+    display: none;
+  }
+
+  @media (max-width: 640px) {
+    .thread-node-row {
+      gap: 8px;
+    }
+    .thread-avatar-col {
+      width: 24px;
+    }
+    .comment-avatar {
+      width: 24px;
+      height: 24px;
+      font-size: 0.72rem;
+    }
+    .thread-node-row.has-children > .thread-avatar-col::after {
+      left: 11px;
+      top: 28px;
+    }
+    .thread-children {
+      margin-left: 11px;
+    }
+    .thread-branch {
+      padding-left: 18px;
+      padding-top: 10px;
+    }
+    .thread-branch::before {
+      width: 14px;
+      height: 23px;
+      border-bottom-left-radius: 8px;
+    }
+    .thread-branch:not(:last-child)::after {
+      top: 0;
+    }
+    .comment-head {
+      font-size: 0.78rem;
+      margin-bottom: 4px;
+    }
+    .comment-body {
+      font-size: 0.82rem;
+      line-height: 1.55;
+    }
+  }
+</style>

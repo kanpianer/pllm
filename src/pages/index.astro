@@ -20,7 +20,7 @@ interface IssueItem {
   url: string;
   createdAt: string;
   updatedAt: string;
-  riskLevel: 'high' | 'warning' | 'resolved' | 'archive';
+  riskLevel: 'high' | 'warning' | 'resolved' | 'runaway' | 'archive';
   labels: LabelItem[];
   summary: string;
   body?: string;
@@ -46,6 +46,7 @@ const counts = {
   high: issues.filter((i) => i.riskLevel === 'high').length,
   warning: issues.filter((i) => i.riskLevel === 'warning').length,
   resolved: issues.filter((i) => i.riskLevel === 'resolved').length,
+  runaway: issues.filter((i) => i.riskLevel === 'runaway').length,
   archive: issues.filter((i) => i.riskLevel === 'archive').length,
 };
 
@@ -62,6 +63,7 @@ const riskMeta = {
   high: { label: '预警 / 疑似跑路', className: 'badge-high' },
   warning: { label: '异常观察中', className: 'badge-warning' },
   resolved: { label: '已恢复 / 误报', className: 'badge-resolved' },
+  runaway: { label: '已跑路', className: 'badge-runaway' },
   archive: { label: '归档', className: 'badge-archive' },
 };
 
@@ -143,6 +145,9 @@ function formatDate(iso: string) {
         <button class="pill" data-risk="resolved">
           🟢 已恢复 <span class="pill-count">{counts.resolved}</span>
         </button>
+        <button class="pill" data-risk="runaway">
+          💀 已跑路 <span class="pill-count">{counts.runaway}</span>
+        </button>
         <button class="pill" data-risk="archive">
           ⚪ 归档 <span class="pill-count">{counts.archive}</span>
         </button>
@@ -172,12 +177,19 @@ function formatDate(iso: string) {
           const createdTs = new Date(item.createdAt).getTime();
           const hotScore = item.commentCount * 2 + item.reactionCount;
           const latestComment = item.latestComments && item.latestComments[0];
+          const latestCommentPreview = latestComment
+            ? latestComment.text
+                .replace(/!\[[^\]]*\]\([^)]+\)/g, '[图片]')
+                .replace(/<img\b[^>]*>/gi, '[图片]')
+                .replace(/\s+/g, ' ')
+                .trim()
+            : '';
           const searchTokens = [
             `#${item.id}`,
             item.title,
             item.summary || '',
             ...(item.labels || []).map((l) => l.name),
-            latestComment ? `${latestComment.author} ${latestComment.text}` : '',
+            latestComment ? `${latestComment.author} ${latestCommentPreview}` : '',
           ].join(' ').toLowerCase();
 
           return (
@@ -217,7 +229,7 @@ function formatDate(iso: string) {
                   <span class="comment-icon">💬</span>
                   <div class="comment-content">
                     <span class="comment-author">@{latestComment.author}：</span>
-                    <span class="comment-text">{latestComment.text}</span>
+                    <span class="comment-text">{latestCommentPreview || '[图片]'}</span>
                   </div>
                 </div>
               )}
@@ -914,6 +926,11 @@ function formatDate(iso: string) {
   .badge-resolved {
     background: var(--risk-ok-bg);
     color: var(--risk-ok-text);
+  }
+
+  .badge-runaway {
+    background: var(--risk-runaway-bg);
+    color: var(--risk-runaway-text);
   }
 
   .badge-archive {

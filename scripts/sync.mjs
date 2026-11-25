@@ -84,13 +84,27 @@ function detectRiskLevel(issue) {
   const state = (issue.state || '').toUpperCase();
   const labels = (issue.labels || []).map((l) => (typeof l === 'string' ? l : l.name || ''));
   const title = issue.title || '';
+  const updatedRaw = issue.updated_at || issue.updatedAt || '';
+  const updatedMs = updatedRaw ? new Date(updatedRaw).getTime() : NaN;
+  const isStale90d =
+    state === 'OPEN' && !Number.isNaN(updatedMs) && Date.now() - updatedMs > 90 * 86400000;
 
   // 1. 明确标记已解决 / 误报 / 已恢复（无论是否已关闭或标题含跑路字样，均归类到已恢复）
   if (labels.some((l) => l.includes('已解决') || l.includes('问题已解决') || l.includes('误报') || l.includes('已恢复'))) {
     return 'resolved';
   }
 
-  // 2. 已关闭（归档）Issue 处理
+  // 2. 明确标记为已跑路标签（无论 OPEN 或 CLOSED，均归类到已跑路，不因超时降级）
+  if (labels.some((l) => l.includes('已跑路') || l.includes('runaway'))) {
+    return 'runaway';
+  }
+
+  // 3. 明确标记过久无人回应 -> 归档
+  if (labels.some((l) => l.includes('过久无人回应'))) {
+    return 'archive';
+  }
+
+  // 4. 已关闭（归档）Issue 处理
   if (state === 'CLOSED') {
     if (labels.some((l) => l.includes('正常'))) {
       return 'resolved';
@@ -106,9 +120,19 @@ function detectRiskLevel(issue) {
     return 'archive';
   }
 
-  // 3. 明确标记或标题为跑路
+  // 5. 无「已跑路」标签且超过 90 天无动态的 OPEN Issue -> 降级归档
+  if (isStale90d) {
+    return 'archive';
+  }
+
+  // 6. 观察中 / 需更多反馈 / 持续异常 标签 -> 归入观察中（不归入预警分类）
+  if (labels.some((l) => l.includes('观察中') || l.includes('需更多反馈') || l.includes('更多反馈') || l.includes('持续异常'))) {
+    return 'warning';
+  }
+
+  // 7. 情节恶劣标签，或标题/标签疑似跑路 / 失联预警 -> 预警
   if (
-    labels.some((l) => l.includes('已跑路') || l.includes('跑路') || l.includes('runaway')) ||
+    labels.some((l) => l.includes('情节恶劣') || l.includes('跑路')) ||
     title.includes('已跑路') ||
     title.includes('跑路') ||
     title.includes('删库') ||
@@ -117,9 +141,9 @@ function detectRiskLevel(issue) {
     return 'high';
   }
 
-  // 4. 预警 / 异常 / 观察中
+  // 8. 预警 / 异常 / 风险
   if (
-    labels.some((l) => l.includes('预警') || l.includes('观察中') || l.includes('风险')) ||
+    labels.some((l) => l.includes('预警') || l.includes('风险')) ||
     title.includes('预警') ||
     title.includes('观察') ||
     title.includes('断流') ||
@@ -136,9 +160,10 @@ function detectRiskLevel(issue) {
 /**
  * 抓取仓库范围内的最新用户评论并按 Issue 归集
  */
-async function fetchRepoComments(maxPages = 15) {
-  console.log('💬 正在抓取社区最新用户评论...');
+async function fetchRepoComments(maxPages = 200) {
+  console.log('💬 正在抓取社区用户评论...');
   const commentsByIssue = new Map();
+  let complete = true;
 
   for (let page = 1; page <= maxPages; page++) {
     try {
@@ -155,31 +180,28 @@ async function fetchRepoComments(maxPages = 15) {
           commentsByIssue.set(issueId, []);
         }
 
-        const list = commentsByIssue.get(issueId);
-        // 每个 issue 最多保留 100 条最新评论
-        if (list.length < 100) {
-          list.push({
-            author: c.user?.login || '匿名用户',
-            text: c.body
-              .replace(/\r\n/g, '\n')
-              .slice(0, 1200)
-              .trim(),
-            createdAt: c.created_at || '',
-          });
-        }
+        commentsByIssue.get(issueId).push({
+          author: c.user?.login || '匿名用户',
+          text: c.body.replace(/\r\n/g, '\n').slice(0, 20000).trim(),
+          createdAt: c.created_at || '',
+        });
       }
+      if (batch.length < 100) break;
+      if (page === maxPages) complete = false;
       await new Promise((r) => setTimeout(r, 150));
     } catch (err) {
       console.warn(`评论抓取第 ${page} 页跳过: ${err.message}`);
+      complete = false;
       break;
     }
   }
 
-  console.log(`💬 已匹配到 ${commentsByIssue.size} 个 Issue 的最新用户评论。`);
-  return commentsByIssue;
+  console.log(`💬 已匹配到 ${commentsByIssue.size} 个 Issue 的用户评论（完整拉取: ${complete ? '是' : '否'}）。`);
+  return { commentsByIssue, complete };
 }
 
 async function sync() {
+  const forceFresh = process.argv.includes('--fresh');
   console.log('🚀 开始同步 limbopro/Paolujichang Issues...');
   if (GITHUB_TOKEN) {
     console.log('🔑 已检测到 GITHUB_TOKEN，使用鉴权模式');
@@ -209,8 +231,12 @@ async function sync() {
     }
 
     rawIssues.push(...list);
+    if (list.length < 100) {
+      console.log(`✅ 第 ${page} 页已达末尾，Issue 拉取完成。`);
+      break;
+    }
     page++;
-    if (page > 10) break;
+    if (page > 50) break;
     await new Promise((r) => setTimeout(r, 200));
   }
 
@@ -222,9 +248,9 @@ async function sync() {
     return;
   }
 
-  // 1.5 读取已有数据以便继承历史评论
+  // 1.5 读取已有数据以便在非完整抓取时继承历史评论
   const existingIssuesMap = new Map();
-  if (fs.existsSync(OUTPUT_FILE)) {
+  if (!forceFresh && fs.existsSync(OUTPUT_FILE)) {
     try {
       const prev = JSON.parse(fs.readFileSync(OUTPUT_FILE, 'utf8'));
       for (const item of prev) {
@@ -234,7 +260,9 @@ async function sync() {
   }
 
   // 2. 抓取最新评论
-  const commentsMap = await fetchRepoComments(GITHUB_TOKEN ? 20 : 10);
+  const { commentsByIssue: commentsMap, complete: commentsComplete } = await fetchRepoComments(
+    GITHUB_TOKEN ? 200 : 10
+  );
 
   // 3. 组装格式化数据
   const formattedIssues = issuesOnly.map((issue) => {
@@ -258,11 +286,13 @@ async function sync() {
     });
 
     const freshComments = commentsMap.get(issue.number) || [];
-    const prevComments = existingIssuesMap.get(issue.number)?.latestComments || [];
     const mergedComments = [...freshComments];
-    for (const pc of prevComments) {
-      if (!mergedComments.some((fc) => fc.createdAt === pc.createdAt || fc.text === pc.text)) {
-        mergedComments.push(pc);
+    if (!commentsComplete && !forceFresh) {
+      const prevComments = existingIssuesMap.get(issue.number)?.latestComments || [];
+      for (const pc of prevComments) {
+        if (!mergedComments.some((fc) => fc.createdAt === pc.createdAt || fc.text === pc.text)) {
+          mergedComments.push(pc);
+        }
       }
     }
     mergedComments.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime());

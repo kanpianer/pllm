@@ -33,9 +33,15 @@ export function cleanIssueBody(body = '', options = {}) {
 
   let text = body.replace(/\r\n/g, '\n').replace(/<!--[\s\S]*?-->/g, '');
 
+  const rescuedImages = [];
   for (const pat of CUT_PATTERNS) {
     const idx = text.search(pat);
     if (idx !== -1) {
+      const removed = text.slice(idx);
+      const imgs = removed.match(/!\[[^\]]*\]\([^)]+\)|<img\b[^>]*>/gi);
+      if (imgs) {
+        rescuedImages.push(...imgs);
+      }
       text = text.slice(0, idx);
     }
   }
@@ -85,6 +91,13 @@ export function cleanIssueBody(body = '', options = {}) {
     .replace(/^(?:---+|⸻|--)\s*\n+/g, '')
     .replace(/\n+\s*(?:---+|⸻|--)$/g, '')
     .trim();
+
+  const uniqueRescued = [...new Set(rescuedImages.map((s) => s.trim()))].filter(
+    (img) => !result.includes(img)
+  );
+  if (uniqueRescued.length > 0) {
+    result = result ? `${result}\n\n${uniqueRescued.join('\n\n')}` : uniqueRescued.join('\n\n');
+  }
 
   return result || fallback;
 }

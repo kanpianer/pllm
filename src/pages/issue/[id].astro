@@ -19,6 +19,7 @@ const riskMeta: Record<string, { label: string; className: string; icon: string 
   high: { label: '预警 / 疑似跑路', className: 'badge-high', icon: '🔴' },
   warning: { label: '异常观察中', className: 'badge-warning', icon: '🟡' },
   resolved: { label: '已恢复 / 误报', className: 'badge-resolved', icon: '🟢' },
+  runaway: { label: '已跑路', className: 'badge-runaway', icon: '💀' },
   archive: { label: '归档', className: 'badge-archive', icon: '⚪' },
 };
 
@@ -166,6 +167,11 @@ const commentThreads = await buildCommentTree(item.latestComments || [], 100);
   .badge-resolved {
     background: var(--risk-ok-bg);
     color: var(--risk-ok-text);
+  }
+
+  .badge-runaway {
+    background: var(--risk-runaway-bg);
+    color: var(--risk-runaway-text);
   }
 
   .badge-archive {

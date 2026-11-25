@@ -206,70 +206,74 @@ const {
     </footer>
 
     <script is:inline>
-      // 悬浮按钮（回到顶部与返回按钮）：位置终固定不变，仅在网页滚动时显示，显示2.2秒后自动消失
+      // 悬浮按钮（回到顶部与返回按钮）：位置始终固定不变，在网页滚动、点击屏幕或移动鼠标时显示，无操作2.2秒后自动消失
       let hideTimer = null;
-      let isHovering = false;
+      let hoveredBtn = null;
 
-      function getFloatingButtons() {
-        return {
-          btt: document.getElementById('back-to-top'),
-          back: document.querySelector('.floating-back-btn'),
-        };
-      }
+      const bttBtn = document.getElementById('back-to-top');
+      const backBtn = document.querySelector('.floating-back-btn');
 
       function showFloatingButtons() {
-        const { btt, back } = getFloatingButtons();
-        if (btt && window.scrollY > 0) {
-          btt.classList.add('visible');
+        if (bttBtn) {
+          if (window.scrollY > 0) {
+            bttBtn.classList.add('visible');
+          } else {
+            bttBtn.classList.remove('visible');
+            if (hoveredBtn === bttBtn) hoveredBtn = null;
+          }
         }
-        if (back) {
-          back.classList.add('visible');
+        if (backBtn) {
+          backBtn.classList.add('visible');
         }
       }
 
       function hideFloatingButtons() {
-        if (isHovering) return;
-        const { btt, back } = getFloatingButtons();
-        if (btt) btt.classList.remove('visible');
-        if (back) back.classList.remove('visible');
+        if (hoveredBtn) return;
+        if (bttBtn) bttBtn.classList.remove('visible');
+        if (backBtn) backBtn.classList.remove('visible');
       }
 
-      function handleScrollActivity() {
-        showFloatingButtons();
+      function resetHideTimer() {
         if (hideTimer) clearTimeout(hideTimer);
         hideTimer = setTimeout(() => {
           hideFloatingButtons();
         }, 2200);
       }
 
-      window.addEventListener('scroll', handleScrollActivity, { passive: true });
+      function handleUserActivity() {
+        showFloatingButtons();
+        resetHideTimer();
+      }
+
+      window.addEventListener('scroll', handleUserActivity, { passive: true });
+      window.addEventListener('mousemove', handleUserActivity, { capture: true, passive: true });
+      window.addEventListener('touchstart', handleUserActivity, { capture: true, passive: true });
+      window.addEventListener('click', handleUserActivity, { capture: true, passive: true });
 
       function bindButtonHover(btn) {
         if (!btn) return;
-        btn.addEventListener('mouseenter', () => {
-          isHovering = true;
+        btn.addEventListener('pointerenter', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          hoveredBtn = btn;
           if (hideTimer) clearTimeout(hideTimer);
         });
-        btn.addEventListener('mouseleave', () => {
-          isHovering = false;
-          if (hideTimer) clearTimeout(hideTimer);
-          hideTimer = setTimeout(() => {
-            hideFloatingButtons();
-          }, 2200);
+        btn.addEventListener('pointerleave', (e) => {
+          if (e.pointerType !== 'mouse') return;
+          if (hoveredBtn === btn) hoveredBtn = null;
+          resetHideTimer();
         });
       }
 
-      const initialBtns = getFloatingButtons();
-      bindButtonHover(initialBtns.btt);
-      bindButtonHover(initialBtns.back);
+      bindButtonHover(bttBtn);
+      bindButtonHover(backBtn);
 
-      if (initialBtns.btt) {
-        initialBtns.btt.addEventListener('click', () => {
+      if (bttBtn) {
+        bttBtn.addEventListener('click', () => {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         });
       }
 
-      if (initialBtns.back) {
+      if (backBtn) {
         const isFromSameSite = () => {
           try {
             return (
@@ -282,7 +286,7 @@ const {
           }
         };
 
-        initialBtns.back.addEventListener('click', (e) => {
+        backBtn.addEventListener('click', (e) => {
           if (isFromSameSite()) {
             e.preventDefault();
             window.history.back();
@@ -637,7 +641,7 @@ const {
     min-height: auto;
   }
 
-  /* 悬浮操作按钮规范（回到顶部与返回按钮）：UI完全一致、纯深色不透明、纯图标、无框线、位置终固定不变、滚动时显示2.2秒后消失 */
+  /* 悬浮操作按钮规范（回到顶部与返回按钮）：UI完全一致、纯深色不透明、纯图标、无框线、位置始终固定不变、滚动/点击屏幕/移动鼠标时显示2.2秒后消失 */
   .back-to-top,
   .floating-back-btn {
     position: fixed;

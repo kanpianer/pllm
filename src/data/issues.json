@@ -1,11 +1,102 @@
 [
   {
+    "id": 407,
+    "title": "[机场跑路/风险反馈]：LiltPupu 千速喵",
+    "state": "OPEN",
+    "url": "https://github.com/limbopro/Paolujichang/issues/407",
+    "createdAt": "2026-11-25T16:58:15Z",
+    "updatedAt": "2026-11-26T10:35:02Z",
+    "riskLevel": "warning",
+    "labels": [
+      {
+        "name": "观察中 👀",
+        "color": "5750e0"
+      }
+    ],
+    "summary": "【机场】LiltPupu · 【现状】还行 · 【补充】官网无法登录，总是提示邮箱或密码错误、但我很肯定没有输错 - 🏷️ ：LiltPupu 🔗 ：LiltPupu.top 🔄 ：服务暂不可用 ⏳ ：2-3年 💰 ：1个月 📖 ：不错 📊 ：还行 🕐 ：2026-11-22 📞 ：否 💻 ：clash verge 📌 ：官网无法登录，",
+    "body": "🏷️ **机场名称**：LiltPupu  \n🔗 **机场网址**：LiltPupu.top  \n🔄 **机场状态**：服务暂不可用  \n⏳ **已使用时长**：2-3年  \n💰 **近期续费套餐时长**：1个月  \n📖 **机场此前使用体验**：不错  \n📊 **机场当前使用体验**：还行  \n🕐 **异常开始时间**：2026-11-22  \n📞 **是否能够与机场方取得联系**：否  \n💻 **所使用的客户端**：clash verge  \n📌 **其他细节补充**：官网无法登录，总是提示邮箱或密码错误、但我很肯定没有输错",
+    "commentCount": 10,
+    "reactionCount": 0,
+    "latestComments": [
+      {
+        "author": "VCS9394",
+        "text": "我是今早4点多全线断掉的  上官网显示维护 \n早上曾经有一次登录进过官网 有新UI   但没法获取URL  放置一段时间后刷新又变维护了 \n偶尔能刷新出个暗色系的登录入口会显示提示邮箱或密码错误  \n希望没跑吧   不过这段时间 基本半个多月就要更新一次URL  看公告也有点怕",
+        "createdAt": "2026-11-26T10:35:02Z"
+      },
+      {
+        "author": "zarinamathusin-svg",
+        "text": "有啥消息吗",
+        "createdAt": "2026-11-26T09:37:18Z"
+      },
+      {
+        "author": "reece-2421",
+        "text": "还是显示在维护，有没有其他稳定的机场推荐",
+        "createdAt": "2026-11-26T08:30:02Z"
+      },
+      {
+        "author": "2028108034abc-byte",
+        "text": "是跑路了么",
+        "createdAt": "2026-11-26T06:15:41Z"
+      },
+      {
+        "author": "limbopro",
+        "text": "> [@limbopro](https://github.com/limbopro) 麻烦帮忙确认一下：是否有 LiltPupu 官方的恢复时间或仍在使用的联系方式？上面这条是付费用户托我代为询问，谢谢。\n\n我这边未找到 liltpupu（千速喵）仍在使用的联系方式。",
+        "createdAt": "2026-11-26T06:04:45Z"
+      },
+      {
+        "author": "2028108034abc-byte",
+        "text": "@limbopro 麻烦帮忙确认一下：是否有 LiltPupu 官方的恢复时间或仍在使用的联系方式？上面这条是付费用户托我代为询问，谢谢。",
+        "createdAt": "2026-11-26T05:23:19Z"
+      },
+      {
+        "author": "2028108034abc-byte",
+        "text": "有付费用户托我代为询问：LiltPupu 官方目前是否仍在处理这次故障？如果能看到，请回复**预计恢复时间**，以及已有账号、套餐和订阅是否会受影响。\n\n目前公开情况是：有用户从 2026-11-22 起遇到登录异常、订阅超时；lpunp.org 与 llpuup.click 会交替出现 503 维护页面，liltpupu.top 也显示“系统维护中”。若维护者能转达或提供仍在使用的官方联系方式，也请一并告知。谢谢。",
+        "createdAt": "2026-11-26T05:22:24Z"
+      },
+      {
+        "author": "2028108034abc-byte",
+        "text": "补一下我这边的实测（2026-11-26 13:00 左右，中国大陆联通家宽实测 + 海外节点交叉验证）：\n\n## 1. 面板层\n\n| 入口 | 结果 |\n|---|---|\n| `lpunp.org/dashboard` | HTTP **200**，但返回的是纯维护页（1422 字节，无任何登录表单），响应头带 `maintenance-id: ge-maint-131-20261126` |\n| `liltpupu.com` | Cloudflare **521** Web server is down（Content-Length: 16，源站连不上） |\n| `liltpupu.top` | **503**，返回官方自写维护页：「系统维护中 / 我们正在为你升级服务，维护期间暂时无法访问。账户与数据都安全保存，请稍后再来看看。」 |\n| `tsmeow.com` | nginx **404**（146 字节） |\n| `tsmeod.top` / `tsre-s.cc` / `tmsretc.top` / `training.lilt-pupu.cc` | **502**（阿里云 120.77.16.127 反代后端全挂） |\n\n同时该面板所有机场 API 全部 404 JSON（`/api/v1/guest/comm/config`、`/api/v1/guest/plan/fetch`、`/api/v1/passport/auth/register`、`/sub` 等均返回 `{\"code\":404,\"message\":\"not found\"}`）。\n\n## 2. 订阅层（关键）\n\n拉自己的订阅链接，服务端返回：\n\n```\nHTTP/1.1 503 Service Unavailable\nRetry-After: 3600\nX-GoEdge-Maintenance: ge-maint-80-20261126\n```\n\n`X-GoEdge-Maintenance` 这个响应头，是 **GoEdge CDN 在后台手动开启「站点维护」**时才会下发的。被 DDoS、被墙、服务器被扣、被打掉，都不会出现这个头（那些是 521/522/超时）。**这意味着是运营方主动在 CDN 后台上把站点设成了维护状态**，而不是被动故障。\n\n## 3. 节点层\n\n配置里 21 个节点全部指向同一个入口域名 `qsv01.qsseasons.click`（端口 50001–51106，按地区分端口）。实测：\n\n- **DNS**：阿里 223.5.5.5 / 腾讯 119.29.29.29 / Google 8.8.8.8 / Cloudflare 1.1.1.1 / 114，五家 + DoH 结果完全一致 → `221.12.14.3`（**中国联通·浙江杭州，AS4837**）。一个「香港节点」的入口被解析到浙江联通的 IP，本身就说明原来的境外服务器已经下线、解析被撤走或接管了。**已排除本地 DNS 污染。**\n- **TCP**：香港 / 台湾 / 新加坡 / 日本 / 美国 / 韩国 / 英国 / 加拿大 **全部连接超时**。\n- **海外交叉验证**：用 check-host.net 的西班牙、法国、伊朗、新加坡四个节点测 `qsv01.qsseasons.click:51101`，**全部 Connection timed out**（报告：https://check-host.net/check-report/5acaba91kead ）。所以不是墙的问题。\n- 另有一个「状态信息」节点域名 `abds-2.yinghu123anyu.com` → **NXDOMAIN（域名已删除）**。\n\n## 4. 时间线\n\n- 2026-08-16：面板上线（DMIT 洛杉矶一组 IP）\n- **2026-10-05 ~ 11-07：域名解析整月空白**（第一组机器消失）\n- 2026-11-07 / 11-11：换新机器上线（Cera 洛杉矶 + NetLab 法兰克福 + GTT 伦敦）\n- **2026-11-22：用户开始报故障**（与本 issue 楼主时间一致）\n- 2026-11-26：GoEdge 全站维护页 + 节点全灭 + 订阅 503\n\n## 5. 一个对照\n\n去年 2025-12-15 出过一次形态几乎相同的故障（#153：官网登不上 + TG 群被禁言 + 联系不上），**24 小时内就恢复并关闭了 issue**。\n\n这次是第 4 天，而且维护页是运营方**手动在 CDN 挂的**，官方渠道至今零回应。\n\n---\n\n**所以想跟楼里确认一下：这两天有没有任何人以任何方式联系上过机场方？到底是不是跑路了？**\n\n如果只是维护，希望机场方能留个说明或者恢复公告，大家好安心等；\n如果确实是跑路了，也希望早点有个定论，让还在准备续费的人别继续往里充钱。\n\n（以上数据来自我本机 2026-11-26 13:00 前后实测，可复现。）",
+        "createdAt": "2026-11-26T05:20:07Z"
+      },
+      {
+        "author": "adduwohui",
+        "text": "还是不行，而且现在订阅出现超时，但毕竟是用了很多年的老站，如果有人能够联系到机场方的话、希望可以问一下是什么情况",
+        "createdAt": "2026-11-26T04:43:28Z"
+      },
+      {
+        "author": "limbopro",
+        "text": "如何了？",
+        "createdAt": "2026-11-26T03:03:08Z"
+      }
+    ]
+  },
+  {
+    "id": 405,
+    "title": "[机场跑路/风险反馈]：naikocloud",
+    "state": "OPEN",
+    "url": "https://github.com/limbopro/Paolujichang/issues/405",
+    "createdAt": "2026-11-25T13:33:52Z",
+    "updatedAt": "2026-11-25T13:33:52Z",
+    "riskLevel": "warning",
+    "labels": [
+      {
+        "name": "观察中 👀",
+        "color": "5750e0"
+      }
+    ],
+    "summary": "【机场】naikoucloud · 【现状】账号限流严重，每天实际使用超过1GB直接断线 · 【不可用】几乎每天都受影响，反馈过后经常无故断线天 - 🏷️ ： naikoucloud 🔗 ： https://naiko.pro/,https://naikonav.com/ 🔄 ：官方宣称对帐号未做限制，实则对帐号进行限流。 ⏳ ：1个月 💰 ：1年 📖 ： 较稳定 📊 ： 账",
+    "body": "🏷️ **机场名称**：  naikoucloud\n🔗 **机场网址**：  https://naiko.pro/,https://naikonav.com/\n🔄 **机场状态**：官方宣称对帐号未做限制，实则对帐号进行限流。\n⏳ **已使用时长**：1个月\n💰 **近期续费套餐时长**：1年\n📖 **机场此前使用体验**：  较稳定\n📊 **机场当前使用体验**：  账号限流严重，每天实际使用超过1GB直接断线\n🕐 **异常开始时间**：2026-11-16 09:26:23\n⏱️ **近期不可用情况起止时间**：  异常开始至今\n📅 **1周内的不可用天数**：  几乎每天都受影响，反馈过后经常无故断线\n📞 **是否能够与机场方取得联系**：能联系，但是沟通无果。现在已经不再回复我\n💬 **机场方是否有回应**：有反应，但宣称机场无任何限制\n📝 **机场方给出的原因或说明**：为给解决方案，要求退订也无果\n📡 **所使用的运营商**：电信\n💻 **所使用的客户端**：  openclash\n\n<img width=\"1430\" height=\"816\" alt=\"image\" src=\"https://github.com/user-attachments/assets/14051f8b-328c-4602-b61f-1074e32490e4\" />\n<img width=\"1426\" height=\"861\" alt=\"image\" src=\"https://github.com/user-attachments/assets/bb132fae-6480-4be3-8542-b9d299a9befc\" />\n<img width=\"1437\" height=\"820\" alt=\"image\" src=\"https://github.com/user-attachments/assets/33bb5acc-3aad-4c74-9122-f7374e297a89\" />",
+    "commentCount": 0,
+    "reactionCount": 0,
+    "latestComments": []
+  },
+  {
     "id": 404,
     "title": "[机场跑路/风险反馈]：光速云机场",
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/404",
     "createdAt": "2026-11-25T09:42:54Z",
-    "updatedAt": "2026-11-25T09:42:54Z",
+    "updatedAt": "2026-11-26T03:04:35Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -15,9 +106,15 @@
     ],
     "summary": "【机场】光速云 · 【现状】全部超时 · 【不可用】7天 · 【补充】该机场是通过https://trialpick.blog/reviews/gsy网站了解到，看到推荐直接购买一年订阅，2026-11-13 14:46:39购买，买完后使用了十分钟左右可用，再次使用是17：30，再使用已是全超时，当时认为是网络原因，切换移动、电信和家庭宽带发现都是全红。之后登录官网联系客服全是无效回复，之后下工单依旧无效回复并直接关闭工单，再次联系客",
     "body": "🏷️ **机场名称**：  光速云\n🔗 **机场网址**：  https://hjesu8erju.guangsut.sbs/#/tickets\n⏳ **已使用时长**：  12天\n💰 **近期续费套餐时长**：  1年\n📖 **机场此前使用体验**： 无 \n📊 **机场当前使用体验**：  全部超时\n🕐 **异常开始时间**：2026-11-13  17:30  \n⏱️ **近期不可用情况起止时间**：2026-11-13  17:30 至 2026-11-25  17:30  \n📅 **1周内的不可用天数**：  7\n📞 **是否能够与机场方取得联系**：无效回复  \n💬 **机场方是否有回应**：部分回应\n📝 **机场方给出的原因或说明**：未给出原因和解决方案\n📡 **所使用的运营商**：移动、电信、广电 、宽带\n💻 **所使用的客户端**： Nextin \n📌 **其他细节补充**：该机场是通过https://trialpick.blog/reviews/gsy网站了解到，看到推荐直接购买一年订阅，2026-11-13 14:46:39购买，买完后使用了十分钟左右可用，再次使用是17：30，再使用已是全超时，当时认为是网络原因，切换移动、电信和家庭宽带发现都是全红。之后登录官网联系客服全是无效回复，之后下工单依旧无效回复并直接关闭工单，再次联系客户要求退款提示提供订单号，提供完订单号后无消息，第二次发起退款工单后直接给我账号封禁了并关闭工单，已虚拟商品为由拒不退款也不提供服务。到目前为止该订阅依旧全超时无法使用。\n**《该订阅不提供订阅链接，只能使用其自研客户端，尽管主页提示推荐使用Clash和Shadowrocket，但购买后不给你订阅链接》**   ---------希望不要再有人受骗\n\n<img width=\"825\" height=\"550\" alt=\"image\" src=\"https://github.com/user-attachments/assets/2f428d8c-edc8-4c96-b297-681c855a6e5e\" />\n\n<img width=\"1185\" height=\"790\" alt=\"image\" src=\"https://github.com/user-attachments/assets/21896c5b-5be7-4e16-8e6d-e0aa3e7c4ea8\" />\n\n<img width=\"1702\" height=\"1276\" alt=\"3d424ec9633dc8984021ae7407316a1a\" src=\"https://github.com/user-attachments/assets/8c76d591-bbf6-43a8-8ac0-292a497bf086\" />",
-    "commentCount": 0,
+    "commentCount": 1,
     "reactionCount": 0,
-    "latestComments": []
+    "latestComments": [
+      {
+        "author": "limbopro",
+        "text": "相关机场活跃 issue https://github.com/limbopro/Paolujichang/issues/283#issuecomment-7181294331",
+        "createdAt": "2026-11-26T03:04:17Z"
+      }
+    ]
   },
   {
     "id": 403,
@@ -1231,7 +1328,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/354",
     "createdAt": "2026-10-17T12:47:56Z",
-    "updatedAt": "2026-11-17T01:08:02Z",
+    "updatedAt": "2026-11-26T05:55:07Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -1241,9 +1338,14 @@
     ],
     "summary": "【机场】星岛梦 · 【现状】糟糕 · 【不可用】7天天 · 【补充】客服回复及其缓慢，基本一两个小时回一句话，退款迟迟无法解决，不正面回答问题 - 🏷️ ： 星岛梦 🔗 ： https://xdmgw.top/ 🔄 ：教育网无法使用 ⏳ ：1周 💰 ：1年 （192元） 📖 ： 糟糕 📊 ： 糟糕 🕐 ：自购买时间起 ⏱️ ： 自购买时间起 📅 ： 7天 📞 ：困难 ",
     "body": "🏷️ **机场名称**：  星岛梦\n🔗 **机场网址**：  https://xdmgw.top/\n🔄 **机场状态**：教育网无法使用\n⏳ **已使用时长**：1周\n💰 **近期续费套餐时长**：1年 （192元） \n📖 **机场此前使用体验**：  糟糕\n📊 **机场当前使用体验**：  糟糕\n🕐 **异常开始时间**：自购买时间起\n⏱️ **近期不可用情况起止时间**：  自购买时间起\n📅 **1周内的不可用天数**：  7天\n📞 **是否能够与机场方取得联系**：困难 \n💬 **机场方是否有回应**：部分回应 \n📝 **机场方给出的原因或说明**：教育网被屏蔽了\n📡 **所使用的运营商**：教育网\n💻 **所使用的客户端**：  windows、安卓\n📌 **其他细节补充**：客服回复及其缓慢，基本一两个小时回一句话，退款迟迟无法解决，不正面回答问题",
-    "commentCount": 7,
+    "commentCount": 8,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "LiDaoKuan",
+        "text": "我来补充. \n他们客户端其实是套壳的 FlClash. 用AI分析了一下\n\n<img width=\"1018\" height=\"70\" alt=\"image\" src=\"https://github.com/user-attachments/assets/c04fc34e-ea3a-42c2-b74b-c9b928ac80fc\" />\n\n结果可能AI分析的时候去服务器拉数据了, 被检测到直接封号了, 问客服也不回. 避雷啊\n\n<img width=\"400\" height=\"821\" alt=\"image\" src=\"https://github.com/user-attachments/assets/4e09c702-f271-4e0d-b2e9-4d02ff30f143\" />\n\n<img width=\"1640\" height=\"474\" alt=\"image\" src=\"https://github.com/user-attachments/assets/0c5e2bca-c39e-4ac3-a118-d9271ab18a8d\" />\n\n20多块直接打水漂了.",
+        "createdAt": "2026-11-26T05:55:07Z"
+      },
       {
         "author": "TTyb",
         "text": "最近基本无法使用了，疑似跑路了",
@@ -2818,7 +2920,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/323",
     "createdAt": "2026-09-06T05:31:59Z",
-    "updatedAt": "2026-10-31T14:43:12Z",
+    "updatedAt": "2026-11-26T02:25:25Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -2828,14 +2930,9 @@
     ],
     "summary": "【机场】星云 · 【现状】卡顿、节点不稳定、经常莫名就断开。 - 🏷️ ： 星云 🔗 ： https://cdn.xxxlsop3.xyz/ ⏳ ：2个月 💰 ：180元/1年 📖 ： 速度很快 📊 ： 卡顿、节点不稳定、经常莫名就断开。 🕐 ：上周开始，基本是下午5点左右。 ⏱️ ： 越来越",
     "body": "🏷️ **机场名称**：  星云\n🔗 **机场网址**：  https://cdn.xxxlsop3.xyz/\n⏳ **已使用时长**：2个月\n💰 **近期续费套餐时长**：180元/1年\n📖 **机场此前使用体验**：  速度很快\n📊 **机场当前使用体验**：  卡顿、节点不稳定、经常莫名就断开。\n🕐 **异常开始时间**：上周开始，基本是下午5点左右。  \n⏱️ **近期不可用情况起止时间**：  越来越频繁。",
-    "commentCount": 6,
+    "commentCount": 5,
     "reactionCount": 0,
     "latestComments": [
-      {
-        "author": "CyraZm",
-        "text": "应该跑了，今天官网上不去节点也全用不了了",
-        "createdAt": "2026-10-31T14:43:12Z"
-      },
       {
         "author": "Jax151",
         "text": "为啥我进都进不去![Screenshot_20260915_151902.jpg](https://github.com/user-attachments/assets/4072390a-803b-4ba7-b8b8-84a371c5cb70)",
@@ -3342,7 +3439,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/319",
     "createdAt": "2026-09-04T08:32:38Z",
-    "updatedAt": "2026-11-16T17:39:26Z",
+    "updatedAt": "2026-11-26T08:38:57Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -3352,9 +3449,14 @@
     ],
     "summary": "【机场】良心云 - 🏷️ ： 良心云 🔗 ： https://xn--9kqz23b19z.com/",
     "body": "<img width=\"858\" height=\"958\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/f81a286f-e0c7-4246-8f9d-56482066f401\" />\n\n🏷️ **机场名称**：  良心云\n🔗 **机场网址**：  https://xn--9kqz23b19z.com/",
-    "commentCount": 24,
+    "commentCount": 25,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "wolfired",
+        "text": "最近很不稳定，就没见到有绿的",
+        "createdAt": "2026-11-26T08:38:57Z"
+      },
       {
         "author": "gssh01557-lab",
         "text": "现在我那个cloudfare验证也正常啊，然后Google旗下那些ip也重新打的开了",
@@ -5644,14 +5746,24 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/283",
     "createdAt": "2026-07-07T09:06:37Z",
-    "updatedAt": "2026-11-25T10:00:37Z",
+    "updatedAt": "2026-11-26T07:59:22Z",
     "riskLevel": "high",
     "labels": [],
     "summary": "： ： ：1天",
     "body": "**光速云**：  \n**https://buf7fuf.gsaat.my/#/home**：  \n**已使用时长**：1天\n\n<img width=\"608\" height=\"551\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/39034ac9-36f0-48e6-8130-fd92e92431c3\" />",
-    "commentCount": 8,
+    "commentCount": 10,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "liukuan97",
+        "text": "> > md我也刚买了一年，一直不给退\n> \n> 给退了吗\n\n退不了，每创建个工单都不回，直接给你关了，有人退成功了的吗",
+        "createdAt": "2026-11-26T07:59:22Z"
+      },
+      {
+        "author": "asen127",
+        "text": "> md我也刚买了一年，一直不给退\n\n给退了吗",
+        "createdAt": "2026-11-26T02:59:17Z"
+      },
       {
         "author": "asen127",
         "text": "完全无法使用，工单要求退款就说虚拟产品不退，不能用还不退款，就是骗，有没有找他们退了钱的，看到的不要再买了",
@@ -8838,7 +8950,7 @@
         "createdAt": "2026-10-16T05:51:25Z"
       },
       {
-        "author": "2848489042chen-boop",
+        "author": "easonchen01",
         "text": "确实是跑路了，已经好几天全部不可用，客服也一直不回复",
         "createdAt": "2026-10-16T02:58:25Z"
       },
@@ -10013,7 +10125,7 @@
     "url": "https://github.com/limbopro/Paolujichang/issues/231",
     "createdAt": "2026-05-02T18:22:02Z",
     "updatedAt": "2026-08-27T15:49:37Z",
-    "riskLevel": "warning",
+    "riskLevel": "archive",
     "labels": [],
     "summary": "【机场】XXAI - ：XXAI ：https://xx-ai.uk/ ：极少节点可用速度很慢，体验极差，现在几乎是弃用状态 ：1年半 ：流量套餐500G ：官网客服几乎都是无用回复或模板回复，最新的消息多日未回 机场暂时还可以使用少量节点，订阅节点与官网节点对",
     "body": "**机场名称**：XXAI\n**机场网址**：https://xx-ai.uk/\n**机场状态**：极少节点可用速度很慢，体验极差，现在几乎是弃用状态\n**已使用时长**：1年半\n**近期续费套餐时长**：流量套餐500G\n**能否与机场方取的联系**：官网客服几乎都是无用回复或模板回复，最新的消息多日未回\n\n机场暂时还可以使用少量节点，订阅节点与官网节点对不上，官网写节点16个可用，但实际可用节点不超过5个，大多无法正常使用且速度极慢，这种情况持续时间近半年。最新的官网咨询多日无人回复，注意不要再买入使用。",
@@ -16902,7 +17014,7 @@
     "url": "https://github.com/limbopro/Paolujichang/issues/168",
     "createdAt": "2026-01-16T05:10:06Z",
     "updatedAt": "2026-08-28T08:13:19Z",
-    "riskLevel": "high",
+    "riskLevel": "archive",
     "labels": [],
     "summary": "【机场】FacMata.NET · 【不可用】7天 - ：FacMata.NET ：https://facmata.net/ ：服务长时不可用 ：半年 ：月 ：否 ：11.25 - 至今 ：7 某日宣称自己数据丢失，丢失了所有用户的密码。 在未告知用户同时未更新网页文档的前提下减少了协议的支持。",
     "body": "**机场名称**：FacMata.NET\n**机场网址**：https://facmata.net/\n**机场状态**：服务长时不可用\n**已使用时长**：半年\n**近期续费套餐时长**：月\n**能否与机场方取的联系**：否\n**不可用情况起止时间**：11.25 - 至今\n**1周内的不可用天数**：7\n\n某日宣称自己数据丢失，丢失了所有用户的密码。\n在未告知用户同时未更新网页文档的前提下减少了协议的支持。\n所有节点经常全部超时。",
@@ -20086,7 +20198,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/114",
     "createdAt": "2025-08-06T07:14:23Z",
-    "updatedAt": "2026-11-18T07:24:19Z",
+    "updatedAt": "2026-11-26T10:07:38Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -20096,9 +20208,24 @@
     ],
     "summary": "【机场】海獭vpn · 【不可用】7天 - ：海獭vpn ：https://cdn.haita.org/dashboard ：跑路 ：半年 ：月付 ：否 ：上个月 ：7",
     "body": "**机场名称**：海獭vpn\n**机场网址**：https://cdn.haita.org/dashboard\n**机场状态**：跑路\n**已使用时长**：半年\n**近期续费套餐时长**：月付\n**能否与机场方取的联系**：否\n**不可用情况起止时间**：上个月\n**1周内的不可用天数**：7\n\n<img width=\"1728\" height=\"996\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/a9a8c740-b526-441e-ae31-16c0985f4790\" />",
-    "commentCount": 43,
+    "commentCount": 46,
     "reactionCount": 1,
     "latestComments": [
+      {
+        "author": "limbopro",
+        "text": "<img width=\"1170\" height=\"1598\" alt=\"IMG_2194\" src=\"https://github.com/user-attachments/assets/db6d6161-b029-4b0a-b077-b045e7edca8d\" />\n\n提醒🔔",
+        "createdAt": "2026-11-26T10:07:38Z"
+      },
+      {
+        "author": "limbopro",
+        "text": "> 小心这个机场死灰复燃了 居然还有人推荐：\n> \n> <img alt=\"image\" width=\"880\" height=\"836\" src=\"https://private-user-images.githubusercontent.com/20573808/719954747-292f93d1-caea-46bc-b198-a13ce18b7538.png?jwt=eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJnaXRodWIuY29tIiwiYXVkIjoicmF3LmdpdGh1YnVzZXJjb250ZW50LmNvbSIsImtleSI6ImtleTUiLCJleHAiOjE3OTU2ODcwODEsIm5iZiI6MTc5NTY4Njc4MSwicGF0aCI6Ii8yMDU3MzgwOC83MTk5NTQ3NDctMjkyZjkzZDEtY2FlYS00NmJjLWIxOTgtYTEzY2UxOGI3NTM4LnBuZz9YLUFtei1BbGdvcml0aG09QVdTNC1ITUFDLVNIQTI1NiZYLUFtei1DcmVkZW50aWFsPUFLSUFWQ09EWUxTQTUzUFFLNFpBJTJGMjAyNjExMjYlMkZ1cy1lYXN0LTElMkZzMyUyRmF3czRfcmVxdWVzdCZYLUFtei1EYXRlPTIwMjYxMTI2VDA5NTMwMVomWC1BbXotRXhwaXJlcz0zMDAmWC1BbXotU2lnbmF0dXJlPThlM2U2ZmZlNDY5MjRiOGVmNDhkMzliNTYyMDdkNGQ1YTgyMWVjYTkzMDVkZGM1MzBmZmNjYmFlZjViYTc4MzgmWC1BbXotU2lnbmVkSGVhZGVycz1ob3N0JnJlc3BvbnNlLWNvbnRlbnQtdHlwZT1pbWFnZSUyRnBuZyJ9.7Qw0mxIfQ3JZcW8Oog2_7FhIxq78-oY5qcaUqo5oJR0\">\n\n搜了下是 hwanz 。**它这个 GitHub 仓库故意关闭了 issue 提交通道。2w+star ~~1w+star~~了，但没有一个用户提 issue （问题），这应该是很不客观的。**  参阅此前用户反馈  https://github.com/limbopro/Paolujichang/issues/318#issuecomment-5520256071",
+        "createdAt": "2026-11-26T09:58:32Z"
+      },
+      {
+        "author": "TTyb",
+        "text": "小心这个机场死灰复燃了\n居然还有人推荐：\n\n<img width=\"880\" height=\"836\" alt=\"image\" src=\"https://github.com/user-attachments/assets/292f93d1-caea-46bc-b198-a13ce18b7538\" />",
+        "createdAt": "2026-11-26T09:29:21Z"
+      },
       {
         "author": "hichanwin",
         "text": "> 官网没进去，节点恢复了\n\n刚刚查看都已恢复，昨晚一点半左右突然全红，现已恢复",

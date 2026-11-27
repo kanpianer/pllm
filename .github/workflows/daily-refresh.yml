@@ -12,9 +12,15 @@ on:
 permissions:
   contents: write
 
+concurrency:
+  group: sync-and-deploy-${{ github.ref }}
+  cancel-in-progress: false
+
 jobs:
   sync-and-deploy:
     name: Sync Issues & Deploy
+    # 使用条件过滤替代提交信息中的 [skip ci]，避免 Cloudflare Pages 跳过自动构建部署
+    if: ${{ !(github.event_name == 'push' && (github.actor == 'github-actions[bot]' || startsWith(github.event.head_commit.message, 'chore(data):'))) }}
     runs-on: ubuntu-latest
     env:
       CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
@@ -44,7 +50,8 @@ jobs:
           git config --local user.name "github-actions[bot]"
           if [ -n "$(git status --porcelain src/data/issues.json)" ]; then
             git add src/data/issues.json
-            git commit -m "chore(data): 自动同步最新预警数据 [skip ci]"
+            git commit -m "chore(data): 自动同步最新预警数据"
+            git pull --rebase origin "${{ github.ref_name }}"
             git push
           else
             echo "数据无更新，无需提交。"

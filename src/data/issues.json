@@ -1,11 +1,31 @@
 [
   {
+    "id": 408,
+    "title": "[机场跑路/风险反馈]：坤坤云",
+    "state": "OPEN",
+    "url": "https://github.com/limbopro/Paolujichang/issues/408",
+    "createdAt": "2026-11-27T14:20:58Z",
+    "updatedAt": "2026-11-27T14:45:29Z",
+    "riskLevel": "warning",
+    "labels": [
+      {
+        "name": "观察中 👀",
+        "color": "5750e0"
+      }
+    ],
+    "summary": "【机场】坤坤云 · 【现状】节点和官网都打不开 · 【不可用】7天 - 若后续，可选择。 ： ```markdown ： 坤坤云 ： https://ikun520.top ：2个月 ：无时间限制流量包 ： 不好 ： 节点和官网都打不开 ：记不清几个月了 ： 7 ：否 ：不确定 ，有tg群，但是它还在的时候，我",
+    "body": "若后续**有迹象表明其问题持续且对日常使用造成严重影响，长时间（一周乃至更长时间）得不到解决的**，可选择**重新提交 issue**。\n：\n\n```markdown\n**机场名称**：  坤坤云\n**机场网址**：  https://ikun520.top \n**已使用时长**：2个月\n**近期续费套餐时长**：无时间限制流量包\n**机场此前使用体验**：  不好\n**机场当前使用体验**：  节点和官网都打不开\n**异常开始时间**：记不清几个月了\n**1周内的不可用天数**：  7\n**目前是否已经恢复**：否\n**是否能够与机场方取得联系**：不确定  ，有tg群，但是它还在的时候，我申请了还没通过我。\n**机场方是否有回应**：不确定\n**机场方给出的原因或说明**：无  \n**所使用的运营商**：不清楚 \n![IMG_20261127_221948.jpg](https://github.com/user-attachments/assets/283e14de-8d77-4ca2-8951-d00e02ca114d)\n\n![Screenshot_2026-11-27-22-20-20-36_948cd9899890cbd5c2798760b2b95377.jpg](https://github.com/user-attachments/assets/74904098-d932-4252-b309-7a4836039a86)",
+    "commentCount": 0,
+    "reactionCount": 0,
+    "latestComments": []
+  },
+  {
     "id": 407,
     "title": "[机场跑路/风险反馈]：LiltPupu 千速喵",
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/407",
     "createdAt": "2026-11-25T16:58:15Z",
-    "updatedAt": "2026-11-27T05:43:44Z",
+    "updatedAt": "2026-11-28T03:14:42Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -15,9 +35,19 @@
     ],
     "summary": "【机场】LiltPupu · 【现状】还行 · 【补充】官网无法登录，总是提示邮箱或密码错误、但我很肯定没有输错 - 🏷️ ：LiltPupu 🔗 ：LiltPupu.top 🔄 ：服务暂不可用 ⏳ ：2-3年 💰 ：1个月 📖 ：不错 📊 ：还行 🕐 ：2026-11-22 📞 ：否 💻 ：clash verge 📌 ：官网无法登录，",
     "body": "🏷️ **机场名称**：LiltPupu  \n🔗 **机场网址**：LiltPupu.top  \n🔄 **机场状态**：服务暂不可用  \n⏳ **已使用时长**：2-3年  \n💰 **近期续费套餐时长**：1个月  \n📖 **机场此前使用体验**：不错  \n📊 **机场当前使用体验**：还行  \n🕐 **异常开始时间**：2026-11-22  \n📞 **是否能够与机场方取得联系**：否  \n💻 **所使用的客户端**：clash verge  \n📌 **其他细节补充**：官网无法登录，总是提示邮箱或密码错误、但我很肯定没有输错",
-    "commentCount": 21,
+    "commentCount": 23,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "lizard315315",
+        "text": "目前还没好",
+        "createdAt": "2026-11-28T03:14:30Z"
+      },
+      {
+        "author": "lix533673-bit",
+        "text": "所以说现在好了吗？",
+        "createdAt": "2026-11-27T14:15:25Z"
+      },
       {
         "author": "adduwohui",
         "text": "这样的话我们安心等恢复就好了💤等恢复了我就会关闭该issue😀",
@@ -131,7 +161,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/405",
     "createdAt": "2026-11-25T13:33:52Z",
-    "updatedAt": "2026-11-25T13:33:52Z",
+    "updatedAt": "2026-11-27T12:18:45Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -141,9 +171,20 @@
     ],
     "summary": "【机场】naikoucloud · 【现状】账号限流严重，每天实际使用超过1GB直接断线 · 【不可用】几乎每天都受影响，反馈过后经常无故断线天 - 🏷️ ： naikoucloud 🔗 ： https://naiko.pro/,https://naikonav.com/ 🔄 ：官方宣称对帐号未做限制，实则对帐号进行限流。 ⏳ ：1个月 💰 ：1年 📖 ： 较稳定 📊 ： 账",
     "body": "🏷️ **机场名称**：  naikoucloud\n🔗 **机场网址**：  https://naiko.pro/,https://naikonav.com/\n🔄 **机场状态**：官方宣称对帐号未做限制，实则对帐号进行限流。\n⏳ **已使用时长**：1个月\n💰 **近期续费套餐时长**：1年\n📖 **机场此前使用体验**：  较稳定\n📊 **机场当前使用体验**：  账号限流严重，每天实际使用超过1GB直接断线\n🕐 **异常开始时间**：2026-11-16 09:26:23\n⏱️ **近期不可用情况起止时间**：  异常开始至今\n📅 **1周内的不可用天数**：  几乎每天都受影响，反馈过后经常无故断线\n📞 **是否能够与机场方取得联系**：能联系，但是沟通无果。现在已经不再回复我\n💬 **机场方是否有回应**：有反应，但宣称机场无任何限制\n📝 **机场方给出的原因或说明**：为给解决方案，要求退订也无果\n📡 **所使用的运营商**：电信\n💻 **所使用的客户端**：  openclash\n\n<img width=\"1430\" height=\"816\" alt=\"image\" src=\"https://github.com/user-attachments/assets/14051f8b-328c-4602-b61f-1074e32490e4\" />\n<img width=\"1426\" height=\"861\" alt=\"image\" src=\"https://github.com/user-attachments/assets/bb132fae-6480-4be3-8542-b9d299a9befc\" />\n<img width=\"1437\" height=\"820\" alt=\"image\" src=\"https://github.com/user-attachments/assets/33bb5acc-3aad-4c74-9122-f7374e297a89\" />",
-    "commentCount": 0,
+    "commentCount": 2,
     "reactionCount": 0,
-    "latestComments": []
+    "latestComments": [
+      {
+        "author": "Jianzichen",
+        "text": "> 如何了？\n\n甩锅，不承认。",
+        "createdAt": "2026-11-27T12:18:45Z"
+      },
+      {
+        "author": "limbopro",
+        "text": "如何了？",
+        "createdAt": "2026-11-27T11:39:59Z"
+      }
+    ]
   },
   {
     "id": 404,
@@ -174,11 +215,11 @@
   {
     "id": 403,
     "title": "sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生",
-    "state": "OPEN",
+    "state": "CLOSED",
     "url": "https://github.com/limbopro/Paolujichang/issues/403",
     "createdAt": "2026-11-24T09:07:57Z",
-    "updatedAt": "2026-11-27T01:50:59Z",
-    "riskLevel": "warning",
+    "updatedAt": "2026-11-27T13:48:59Z",
+    "riskLevel": "archive",
     "labels": [],
     "summary": "Go 都不用 sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生 sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生 sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生 sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生 sb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生 sb流量光，他妈第三方订阅不能用还他",
     "body": "# Go 都不用\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生\n\nsb流量光，他妈第三方订阅不能用还他妈不给退钱，真是你吗出生",
@@ -203,7 +244,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/401",
     "createdAt": "2026-11-23T13:07:41Z",
-    "updatedAt": "2026-11-23T13:08:34Z",
+    "updatedAt": "2026-11-27T11:42:33Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -213,17 +254,23 @@
     ],
     "summary": "【机场】速界 · 【现状】HTTP502不可用 · 【不可用】1天 - 🏷️ ： 速界 🔗 ： speedworld.homes 🔄 ： 服务暂不可用 ⏳ ： 约2周 💰 ： 一月 📖 ： 速度高，同时罕见的不稳定(指不稳定程度罕见，能不能用几乎全看运气)。 📊 ： HTTP502不可用 🕐 ：2",
     "body": "🏷️ **机场名称**：  速界  \n🔗 **机场网址**：  speedworld.homes\n🔄 **机场状态**：  服务暂不可用  \n⏳ **已使用时长**：  约2周\n💰 **近期续费套餐时长**：  一月\n📖 **机场此前使用体验**：  速度高，同时罕见的不稳定(指不稳定程度罕见，能不能用几乎全看运气)。  \n📊 **机场当前使用体验**： HTTP502不可用  \n🕐 **异常开始时间**：2026/11/23  \n⏱️ **近期不可用情况起止时间**：  2026/11/23\n📅 **1周内的不可用天数**：  1\n📞 **是否能够与机场方取得联系**：暂不能(工单也502)  \n💬 **机场方是否有回应**：无(工单 官网 APP全都502)  \n📡 **所使用的运营商**：未知  \n💻 **所使用的客户端**：  Android官方客户端&Windows官方客户端",
-    "commentCount": 0,
+    "commentCount": 1,
     "reactionCount": 0,
-    "latestComments": []
+    "latestComments": [
+      {
+        "author": "limbopro",
+        "text": "统一至 https://github.com/limbopro/Paolujichang/issues/393 讨论",
+        "createdAt": "2026-11-27T11:42:28Z"
+      }
+    ]
   },
   {
     "id": 399,
-    "title": "[机场跑路/风险反馈]：XFLTD",
+    "title": "[机场跑路/风险反馈]：XFLTD 养鸡场",
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/399",
     "createdAt": "2026-11-23T06:43:24Z",
-    "updatedAt": "2026-11-23T06:43:24Z",
+    "updatedAt": "2026-11-27T11:44:38Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -233,9 +280,15 @@
     ],
     "summary": "【机场】XFLTD · 【现状】直接不让导入订阅了，工单创了一两个月也不回复，这两天发现账号好像被🈲了，咱也不知道咱干嘛了 · 【不可用】7天 - 🏷️ ： XFLTD 🔗 ： https://www.xfltd.org ⏳ ：1年 📖 ： 之前挺好用 📊 ： 直接不让导入订阅了，工单创了一两个月也不回复，这两天发现账号好像被🈲了，咱也不知道咱干嘛了 🕐 ：2026.9.2",
     "body": "🏷️ **机场名称**：  XFLTD\n🔗 **机场网址**：  https://www.xfltd.org\n⏳ **已使用时长**：1年\n📖 **机场此前使用体验**：  之前挺好用\n📊 **机场当前使用体验**：  直接不让导入订阅了，工单创了一两个月也不回复，这两天发现账号好像被🈲了，咱也不知道咱干嘛了\n🕐 **异常开始时间**：2026.9.21\n⏱️ **近期不可用情况起止时间**：  2026.9.21\n📅 **1周内的不可用天数**： 7 \n📞 **是否能够与机场方取得联系**：不确定\n💬 **机场方是否有回应**：无\n💻 **所使用的客户端**：  clash verge\n\n<img width=\"425\" height=\"215\" alt=\"屏幕截图 2026-11-05 144405\" src=\"https://github.com/user-attachments/assets/acbd4e0a-18a3-4663-aea9-50e49e4128b0\" />\n\n<img width=\"647\" height=\"266\" alt=\"屏幕截图 2026-11-23 142246\" src=\"https://github.com/user-attachments/assets/ca7fc9dc-b7a3-42ac-9144-3f593cce9738\" />\n\n<img width=\"602\" height=\"518\" alt=\"image\" src=\"https://github.com/user-attachments/assets/89baabd4-5b2d-4eab-9567-000c8b2289e4\" />",
-    "commentCount": 0,
+    "commentCount": 1,
     "reactionCount": 0,
-    "latestComments": []
+    "latestComments": [
+      {
+        "author": "limbopro",
+        "text": "养鸡场相关活跃issue https://github.com/limbopro/Paolujichang/issues/234",
+        "createdAt": "2026-11-27T11:44:29Z"
+      }
+    ]
   },
   {
     "id": 398,
@@ -752,7 +805,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/378",
     "createdAt": "2026-11-04T05:52:17Z",
-    "updatedAt": "2026-11-04T06:11:51Z",
+    "updatedAt": "2026-11-27T11:41:27Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -762,9 +815,14 @@
     ],
     "summary": "【机场】速界 · 【现状】垃圾 ，十分垃圾，狗都嫌弃 - 🏷️ ： 速界 🔗 ： 经常换，不给他打广告 🔄 ： 还在运行，但极不稳定，断线频率太高 ⏳ ：0.3年，别看我时间短，但我一冲就冲了1年，自打用上了这个机场，我都快抑郁了，就没好好放心用过，不是今天断就是明天断，一天断好几次，退款也",
     "body": "🏷️ **机场名称**：  速界\n🔗 **机场网址**：  经常换，不给他打广告\n🔄 **机场状态**： 还在运行，但极不稳定，断线频率太高\n⏳ **已使用时长**：0.3年，别看我时间短，但我一冲就冲了1年，自打用上了这个机场，我都快抑郁了，就没好好放心用过，不是今天断就是明天断，一天断好几次，退款也不退，客服只能发工单，还回复贼慢，也不补偿。反正是上了贼船下船难。\n💰 **近期续费套餐时长**：1年  \n📖 **机场此前使用体验**：也是看了某机场榜单，排名挺靠前，看了下价格直接冲了  \n📊 **机场当前使用体验**：  垃圾 ，十分垃圾，狗都嫌弃\n🕐 **异常开始时间**：应该是异常很久了，主要我没试用直接就冲了，头脑发热了。\n⏱️ **近期不可用情况起止时间**：  从8月充值开始\n📞 **是否能够与机场方取得联系**：能\n💬 **机场方是否有回应**：部分回应，避重就轻，甩锅\n📝 **机场方给出的原因或说明**：甩锅 \n💻 **所使用的客户端**：  只能用它开发的客户端，这个是个大问题，谁家不用clash啊，它找个内核套个壳逼着别人用自己的客户端。关键还不好用。",
-    "commentCount": 1,
+    "commentCount": 2,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "limbopro",
+        "text": "类似机场issue https://github.com/limbopro/Paolujichang/issues/393",
+        "createdAt": "2026-11-27T11:41:19Z"
+      },
       {
         "author": "limbopro",
         "text": "保持月付，保持干燥！",
@@ -1061,7 +1119,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/363",
     "createdAt": "2026-10-27T13:36:41Z",
-    "updatedAt": "2026-10-31T10:16:07Z",
+    "updatedAt": "2026-11-28T04:47:22Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -1071,9 +1129,14 @@
     ],
     "summary": "【机场】Now加速 - 🏷️ ： Now加速 🔗 ： https://www.noww.cc/ 🔄 ：乱封账号，还不给解封 ⏳ ：2个月 💰 ：不限时流量 📖 ： 还行 🕐 ：2026年10月18日 📞 ：能 💬 ：部分回应 📝 ：一直问我要资料",
     "body": "🏷️ **机场名称**：  Now加速  \n🔗 **机场网址**：  https://www.noww.cc/  \n🔄 **机场状态**：乱封账号，还不给解封  \n⏳ **已使用时长**：2个月  \n💰 **近期续费套餐时长**：不限时流量  \n📖 **机场此前使用体验**：  还行  \n🕐 **异常开始时间**：2026年10月18日  \n📞 **是否能够与机场方取得联系**：能  \n💬 **机场方是否有回应**：部分回应    \n📝 **机场方给出的原因或说明**：一直问我要资料，还不给解封  \n📡 **所使用的运营商**：移动  \n我本来打算备用的，所以买的不限时流量，但只用了一点点流量就把我账号封了，找他解封问东问西。这些东西不是他一查就有了吗，还要找我要。他要什么资料都给他了，最后还关掉工单。\n\n<img width=\"1919\" height=\"2149\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/83a9267e-1b09-450e-a888-b792971a5e12\" />\n<img width=\"1920\" height=\"912\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/56e29786-7cbd-400f-8b51-5bf13020672f\" />",
-    "commentCount": 3,
+    "commentCount": 4,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "darveydev",
+        "text": "我用的这段时间还好  不敢一次性买不限时  但每次出现问题我找客服都给我好好解决了  不过就是解决的速度有点慢",
+        "createdAt": "2026-11-28T04:47:22Z"
+      },
       {
         "author": "Subject-Z",
         "text": "> 4\\. ta家声称是 台湾台灣即時科技有限公司 旗下的产品，但这家公司显示为歇业状态。\n\n我看了下历史反馈，这机场还有个克隆版的，而且也是乱封号，估计是真卷钱跑路了。\n\nhttps://github.com/limbopro/Paolujichang/issues/357\nhttps://github.com/everett7623/airport-recommendations-2026/issues/25",
@@ -2374,7 +2437,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/335",
     "createdAt": "2026-09-24T01:27:36Z",
-    "updatedAt": "2026-11-27T05:51:53Z",
+    "updatedAt": "2026-11-28T02:34:08Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -2384,9 +2447,19 @@
     ],
     "summary": "【机场】YToo 歪兔 · 【现状】所有节点都超时，网站打不开，客服完全联系不上 - 🏷️ ： YToo 歪兔 🔗 ： https://y-too.net 🔄 ：已跑路 ⏳ ：半年 💰 ：1年 📖 ： 节点较多，大部分情况下稳定，偶尔超时提工单，客服会回应 📊 ： 所有节点都超时，网站打不开，客服完全联系不上 \ud83d",
     "body": "🏷️ **机场名称**：  YToo 歪兔\n\n🔗 **机场网址**：  https://y-too.net\n\n🔄 **机场状态**：已跑路\n\n⏳ **已使用时长**：半年\n\n💰 **近期续费套餐时长**：1年\n\n📖 **机场此前使用体验**： 节点较多，大部分情况下稳定，偶尔超时提工单，客服会回应\n\n📊 **机场当前使用体验**：  所有节点都超时，网站打不开，客服完全联系不上\n\n🕐 **异常开始时间**：2026-09-24 09:00\n\n今年4月份买的，充了1年370多，很多人推荐的老牌机场，没想到才用了半年就跑了，艹他马",
-    "commentCount": 9,
+    "commentCount": 11,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "maxfong",
+        "text": "坐标上海，都是可用的，而且从上半年到现在一直都是可用的(因为每天要用AI)。。是不是区域问题?",
+        "createdAt": "2026-11-28T02:34:08Z"
+      },
+      {
+        "author": "imovoz",
+        "text": "确实烂完了，客服永远给不出确定的回复，这个价格也不便宜。",
+        "createdAt": "2026-11-28T02:23:32Z"
+      },
       {
         "author": "gesturepotter",
         "text": "同样，用了两年了，但是今年特别抽风，都不知道是为什么？",
@@ -3072,7 +3145,7 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/321",
     "createdAt": "2026-09-05T07:08:41Z",
-    "updatedAt": "2026-10-31T08:12:16Z",
+    "updatedAt": "2026-11-28T03:23:27Z",
     "riskLevel": "warning",
     "labels": [
       {
@@ -3082,9 +3155,19 @@
     ],
     "summary": "【机场】Mitce · 【现状】完全无法使用 · 【不可用】7天 - 🏷️ ： Mitce 🔗 ： mitce.io ⏳ ：一年） 💰 ：3月） 📖 ： 还行 📊 ： 完全无法使用 🕐 ：2026-08-30 12:00左右 ⏱️ ： 2026-9-5 📅 ： 7 🔄 ：是 📞 ：是 💬 ",
     "body": "🏷️ **机场名称**：  Mitce\n🔗 **机场网址**：  mitce.io\n⏳ **已使用时长**：一年）  \n💰 **近期续费套餐时长**：3月）  \n📖 **机场此前使用体验**：  还行\n📊 **机场当前使用体验**：  完全无法使用\n🕐 **异常开始时间**：2026-08-30 12:00左右\n⏱️ **近期不可用情况起止时间**：  2026-9-5\n📅 **1周内的不可用天数**：  7\n🔄 **目前是否已经恢复**：是\n📞 **是否能够与机场方取得联系**：是\n💬 **机场方是否有回应**：是\n📝 **机场方给出的原因或说明**：风控导致现在已经恢复\n📡 **所使用的运营商**：联通  \n💻 **所使用的客户端**：  Clash",
-    "commentCount": 71,
+    "commentCount": 73,
     "reactionCount": 2,
     "latestComments": [
+      {
+        "author": "Tanyx08",
+        "text": "昨天只有一个节点能用了，今天又全红了",
+        "createdAt": "2026-11-28T03:23:27Z"
+      },
+      {
+        "author": "wowguoqing",
+        "text": "别买就对了，谁要买的联系我，我充值了90$还没用，也不退款，半价出",
+        "createdAt": "2026-11-27T11:12:07Z"
+      },
       {
         "author": "Lik-Lee",
         "text": "> 3\\. 问题不大，所有机场都会经历全部 timeout 的情况。耐心等待恢复...保持月付。\n你好，建议从新开启这个跑路观察，节点能用的很少，也基本都送中了，谷歌打不开。官方tg里都是嘲讽谩骂 说的都是不能用\n\n<img width=\"889\" height=\"688\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/1ad5d5e3-423d-463b-a2e2-4ed7cb4d00bd\" />",
@@ -10051,14 +10134,19 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/234",
     "createdAt": "2026-05-09T11:21:06Z",
-    "updatedAt": "2026-11-25T07:47:27Z",
+    "updatedAt": "2026-11-27T12:52:07Z",
     "riskLevel": "high",
     "labels": [],
     "summary": "【机场】xfltd/养鸡场 · 【不可用】7天 - ：xfltd/养鸡场 ：xfltd.org ：服务长时不可用 ：1年 ：1年 ：能 ：2025.4.3 ：7 机场订阅地址有效期10分钟，重置地址、刷新页面均无法导入订阅。问题未解决随意关闭工单，多次反馈工单、客服敷衍重复回复。补充gif操",
     "body": "**机场名称**：xfltd/养鸡场\n**机场网址**：xfltd.org\n**机场状态**：服务长时不可用\n**已使用时长**：1年\n**近期续费套餐时长**：1年\n**能否与机场方取的联系**：能\n**不可用情况起止时间**：2025.4.3\n**1周内的不可用天数**：7\n\n机场订阅地址有效期10分钟，重置地址、刷新页面均无法导入订阅。问题未解决随意关闭工单，多次反馈工单、客服敷衍重复回复。补充gif操作动画说明导入操作仍无问题重复回复\n本就作为备用机场极少使用，如此态度实在无语\n\n<img width=\"678\" height=\"686\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/6cf17673-046c-40ff-bf93-2b1601dfdeeb\" />\n<img width=\"707\" height=\"711\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/a62e8e3d-a595-4cb8-949b-148866e2af69\" />\n<img width=\"677\" height=\"603\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/49c6d83e-df91-4833-b99a-a8df8274d502\" />\n<img width=\"681\" height=\"684\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/34d2cccd-842e-4a87-93dd-30201b5b6e5d\" />\n<img width=\"716\" height=\"719\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/811d332c-a1a4-4884-9a2a-ac8c3c561140\" />\n工单中附带的操作gif\n<img width=\"856\" height=\"522\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/5b603e27-7a1e-4417-ac39-713427703a99\" />\n涨价倒是动作很快\n<img width=\"670\" height=\"491\" alt=\"Image\" src=\"https://github.com/user-attachments/assets/40b79e39-1299-4ebd-b091-0f7747f060a1\" />",
-    "commentCount": 11,
+    "commentCount": 12,
     "reactionCount": 0,
     "latestComments": [
+      {
+        "author": "lolinyaanyaamoe",
+        "text": "反正也是备用，最近好像导入重新做了，以前不少软件订阅导入不进去",
+        "createdAt": "2026-11-27T12:52:07Z"
+      },
       {
         "author": "Marvin-ee",
         "text": "我买了之前的120g的流量，一年了没用过多少g，倒回去想用，却发现已经用不了了，问客服客服就让你仔细看教程。按照教程走一遍它还会说你看得不够仔细。",
@@ -15291,14 +15379,19 @@
     "state": "OPEN",
     "url": "https://github.com/limbopro/Paolujichang/issues/183",
     "createdAt": "2026-03-20T02:49:11Z",
-    "updatedAt": "2026-11-13T10:52:24Z",
+    "updatedAt": "2026-11-28T02:36:24Z",
     "riskLevel": "high",
     "labels": [],
     "summary": "【机场】星云机场 - ：星云机场 ：https://www.xyfast.xyz/ ：所有节点超时 ：半年 ：一年 ：否 ：2026-03.16 ：Telegram群组已经禁言，无法联系到官方，官方声称被攻击勒索，停运降临1周，没有任何进度同步",
     "body": "**机场名称**：星云机场\n**机场网址**：https://www.xyfast.xyz/\n**机场状态**：所有节点超时\n**已使用时长**：半年\n**近期续费套餐时长**：一年\n**能否与机场方取的联系**：否\n**不可用情况起止时间**：2026-03.16\n\n**其他补充**：Telegram群组已经禁言，无法联系到官方，官方声称被攻击勒索，停运降临1周，没有任何进度同步",
-    "commentCount": 41,
+    "commentCount": 42,
     "reactionCount": 1,
     "latestComments": [
+      {
+        "author": "Ocean22",
+        "text": "家人们快跑，提交了个工单，反馈经常用不了，直接就恶意把我当月的流量置零，然后我再次反馈直接把我号给封了。\n\n<img width=\"2526\" height=\"1203\" alt=\"image\" src=\"https://github.com/user-attachments/assets/06c7f593-11b9-4e6b-bd87-a59b1be48744\" />",
+        "createdAt": "2026-11-28T02:36:24Z"
+      },
       {
         "author": "chihundun",
         "text": "> > 有没有用着的兄弟 告诉下怎么样啊现在 在犹豫中\n> > 千万别入手，非常狗\n\n作为10元150g是性价比很高的了，缺点就是有固定时间段会爆红。可以当一个流量包的副机场，用来刷刷视频这些很不错。目前我还买了一个主的是60元250g，直接可以买星云半年了，哈哈哈哈。便宜和稳定还有干净总有一个不能兼得，你看你自己的选择吧\n\n<img width=\"1151\" height=\"523\" alt=\"截屏2026-11-13 18 46 22\" src=\"https://github.com/user-attachments/assets/2ac01d35-5d9f-4590-a214-0300c8ba2f80\" />",
